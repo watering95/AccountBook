@@ -8,14 +8,19 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.accountbook.drawerScreens
+import com.example.accountbook.drawerBodies
+import com.example.accountbook.drawerHeads
 
 @Composable
 fun Drawer(
     itemClick: (String) -> Unit
 ) {
-    DrawerHeader() {
-        itemClick("Setting")
+    Column() {
+        drawerHeads.forEach { item ->
+            DrawerHeader(item) {
+                itemClick(item)
+            }
+        }
     }
 
     LazyColumn(
@@ -23,7 +28,7 @@ fun Drawer(
             .fillMaxSize(),
         contentPadding = PaddingValues(vertical = 16.dp)
     ) {
-        items(drawerScreens) { item ->
+        items(drawerBodies) { item ->
             DrawerBody(item) {
                 itemClick(item)
             }
@@ -32,12 +37,10 @@ fun Drawer(
 }
 
 @Composable
-fun DrawerHeader(itemClick:(String) -> Unit) {
-    Text(
-        modifier = Modifier.padding(16.dp)
-            .clickable { itemClick("Setting") },
-        text = "Setting"
-    )
+fun DrawerHeader(item: String, itemClick:(String) -> Unit) {
+    NavigationListItem(item = item) {
+        itemClick(item)
+    }
 }
 
 @Composable
@@ -50,7 +53,8 @@ fun DrawerBody(item: String, itemClick: (String) -> Unit) {
 @Composable
 fun NavigationListItem(item: String, itemClick:(String) -> Unit) {
     Text(
-        modifier = Modifier.padding(16.dp)
+        modifier = Modifier
+            .padding(16.dp)
             .clickable { itemClick(item) },
         text = item
     )

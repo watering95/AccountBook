@@ -5,8 +5,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -24,13 +22,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.accountbook.componant.Drawer
-import com.example.accountbook.componant.TopBar
-import com.example.accountbook.screen.AccountScreen
+import com.example.accountbook.componant.MainTopBar
+import com.example.accountbook.componant.SettingTopBar
+import com.example.accountbook.screen.*
 import com.example.accountbook.ui.theme.AccountBookTheme
 import com.example.accountbook.viewmodel.MainViewModel
-import com.example.accountbook.screen.BookScreen
-import com.example.accountbook.screen.HomeScreen
-import com.example.accountbook.screen.SettingScreen
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -51,7 +48,6 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainScreenView() {
     val navController = rememberNavController()
-    val viewModel = viewModel<MainViewModel>()
     val coroutineScope = rememberCoroutineScope()
     val scaffoldState = rememberScaffoldState()
     val openDrawer = {
@@ -62,11 +58,7 @@ fun MainScreenView() {
 
     Scaffold (
         scaffoldState = scaffoldState,
-        topBar = { TopBar(
-            title = viewModel.title.value,
-            buttonIcon = Icons.Filled.Menu,
-            onButtonClicked = { openDrawer() }
-        ) },
+        topBar = { NavigationTopbar(navController, openDrawer)},
         bottomBar = { BottomNavigation(navController) },
         drawerContent = {
             Drawer { route ->
@@ -95,11 +87,11 @@ fun MainScreenView() {
 sealed class NavItem(var title: String, var icon: Int, var route: String) {
     object HomeScreen : NavItem("Home", R.drawable.ic_launcher_foreground, "Home")
     object BookScreen : NavItem("Book", R.drawable.ic_launcher_foreground, "Book")
-    object SettingScreen : NavItem("Setting", R.drawable.ic_launcher_foreground, "Setting")
 }
 
 val bottomScreens = listOf(NavItem.HomeScreen, NavItem.BookScreen)
-val drawerScreens = listOf("Account1","Account2","Account3","Account4","Account5","Account6","Account1","Account2","Account3","Account4","Account5","Account6","Account1","Account2","Account3","Account4","Account5","Account6")
+val drawerHeads = listOf("Set Group","Set Account", "Set Card", "Set Category","DB")
+val drawerBodies = listOf("Account1","Account2","Account3","Account4","Account5","Account6","Account1","Account2","Account3","Account4","Account5","Account6","Account1","Account2","Account3","Account4","Account5","Account6")
 
 @Composable
 fun BottomNavigation(navController: NavController) {
@@ -129,6 +121,67 @@ fun BottomNavigation(navController: NavController) {
         }
     }
 }
+@Composable
+fun NavigationTopbar(navController: NavHostController, openDrawer: () -> Job) {
+    val viewModel = viewModel<MainViewModel>()
+
+    NavHost(navController = navController, startDestination = NavItem.HomeScreen.route) {
+        composable(NavItem.HomeScreen.route) {
+            MainTopBar(
+                title = viewModel.title.value,
+                onButtonNavigationClicked = { openDrawer() }
+            )
+        }
+        composable(NavItem.BookScreen.route) {
+            MainTopBar(
+                title = viewModel.title.value,
+                onButtonNavigationClicked = { openDrawer() }
+            )
+        }
+        drawerHeads.forEach { route ->
+            composable(route) {
+                when(route) {
+                    "Set Group" -> SettingTopBar(
+                        title = viewModel.title.value,
+                        onButtonNavigationClicked = { openDrawer() },
+                        onButtonSaveClicked = {},
+                        onButtonDeleteClicked = {}
+                    )
+                    "Set Account" -> SettingTopBar(
+                        title = viewModel.title.value,
+                        onButtonNavigationClicked = { openDrawer() },
+                        onButtonSaveClicked = {},
+                        onButtonDeleteClicked = {}
+                    )
+                    "Set Card" -> SettingTopBar(
+                        title = viewModel.title.value,
+                        onButtonNavigationClicked = { openDrawer() },
+                        onButtonSaveClicked = {},
+                        onButtonDeleteClicked = {}
+                    )
+                    "Set Category" -> SettingTopBar(
+                        title = viewModel.title.value,
+                        onButtonNavigationClicked = { openDrawer() },
+                        onButtonSaveClicked = {},
+                        onButtonDeleteClicked = {}
+                    )
+                    "DB" -> MainTopBar(
+                        title = viewModel.title.value,
+                        onButtonNavigationClicked = { openDrawer() }
+                    )
+                }
+            }
+        }
+        drawerBodies.forEach { route ->
+            composable(route) {
+                MainTopBar(
+                    title = viewModel.title.value,
+                    onButtonNavigationClicked = { openDrawer() }
+                )
+            }
+        }
+    }
+}
 
 @Composable
 fun NavigationGraph(navController: NavHostController) {
@@ -136,18 +189,25 @@ fun NavigationGraph(navController: NavHostController) {
 
     NavHost(navController = navController, startDestination = NavItem.HomeScreen.route) {
         composable(NavItem.HomeScreen.route) {
-            viewModel.changeTitle("HomeScreen")
+            viewModel.changeTitle(NavItem.HomeScreen.title)
             HomeScreen()
         }
         composable(NavItem.BookScreen.route) {
-            viewModel.changeTitle("BookScreen")
+            viewModel.changeTitle(NavItem.BookScreen.title)
             BookScreen()
         }
-        composable(NavItem.SettingScreen.route) {
-            viewModel.changeTitle("SettingScreen")
-            SettingScreen()
+        drawerHeads.forEach { route ->
+            composable(route) {
+                viewModel.changeTitle(route)
+                when(route) {
+                    "Set Group" -> SetGroupScreen()
+                    "Set Account" -> SetAccountScreen()
+                    "Set Card" -> SetCardScreen()
+                    "Set Category" -> SetCategoryScreen()
+                }
+            }
         }
-        drawerScreens.forEach { route ->
+        drawerBodies.forEach { route ->
             composable(route) {
                 viewModel.changeTitle(route)
                 AccountScreen()
