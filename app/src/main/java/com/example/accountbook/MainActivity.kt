@@ -1,6 +1,7 @@
 package com.example.accountbook
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
@@ -10,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -27,13 +29,14 @@ import com.example.accountbook.componant.SettingTopBar
 import com.example.accountbook.screen.*
 import com.example.accountbook.ui.theme.AccountBookTheme
 import com.example.accountbook.viewmodel.MainViewModel
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 class MainActivity : ComponentActivity() {
+    private val scope = CoroutineScope(Job() + Dispatchers.Main)
+    lateinit var db: AppRoomDatabase
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        db = AppRoomDatabase.getInstance(this, scope)
         setContent {
             AccountBookTheme {
                 // A surface container using the 'background' color from the theme
@@ -58,7 +61,7 @@ fun MainScreenView() {
 
     Scaffold (
         scaffoldState = scaffoldState,
-        topBar = { NavigationTopbar(navController, openDrawer)},
+        topBar = { NavigationTopbar(navController = navController, openDrawer = openDrawer)},
         bottomBar = { BottomNavigation(navController) },
         drawerContent = {
             Drawer { route ->
@@ -122,9 +125,7 @@ fun BottomNavigation(navController: NavController) {
     }
 }
 @Composable
-fun NavigationTopbar(navController: NavHostController, openDrawer: () -> Job) {
-    val viewModel = viewModel<MainViewModel>()
-
+fun NavigationTopbar(navController: NavHostController, viewModel:MainViewModel = viewModel(), openDrawer: () -> Job) {
     NavHost(navController = navController, startDestination = NavItem.HomeScreen.route) {
         composable(NavItem.HomeScreen.route) {
             MainTopBar(
@@ -184,9 +185,7 @@ fun NavigationTopbar(navController: NavHostController, openDrawer: () -> Job) {
 }
 
 @Composable
-fun NavigationGraph(navController: NavHostController) {
-    val viewModel = viewModel<MainViewModel>()
-
+fun NavigationGraph(navController: NavHostController, viewModel: MainViewModel = viewModel()) {
     NavHost(navController = navController, startDestination = NavItem.HomeScreen.route) {
         composable(NavItem.HomeScreen.route) {
             viewModel.changeTitle(NavItem.HomeScreen.title)
@@ -200,7 +199,7 @@ fun NavigationGraph(navController: NavHostController) {
             composable(route) {
                 viewModel.changeTitle(route)
                 when(route) {
-                    "Set Group" -> SetGroupScreen()
+                    "Set Group" -> SetGroupScreen((LocalContext.current as MainActivity).db)
                     "Set Account" -> SetAccountScreen()
                     "Set Card" -> SetCardScreen()
                     "Set Category" -> SetCategoryScreen()

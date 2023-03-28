@@ -5,15 +5,15 @@ import com.example.accountbook.data.Category
 
 @Dao
 interface CategoryDao {
-    @Query("SELECT * FROM category")
+    @Query("SELECT * FROM tbl_Category")
     fun getAll(): List<Category>
 
-    @Insert
-    fun insert(category: Category)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insert(category: Category)
 
-    @Update
-    fun update(category: Category)
+    @Update(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun update(category: Category)
 
     @Delete
-    fun delete(category: Category)
+    suspend fun delete(category: Category)
 }

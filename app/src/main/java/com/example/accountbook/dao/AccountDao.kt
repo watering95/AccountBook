@@ -5,15 +5,15 @@ import com.example.accountbook.data.Account
 
 @Dao
 interface AccountDao {
-    @Query("SELECT * FROM account")
+    @Query("SELECT * FROM tbl_Account")
     fun getAll(): List<Account>
 
-    @Insert
-    fun insert(account: Account)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insert(account: Account)
 
-    @Update
-    fun update(account: Account)
+    @Update(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun update(account: Account)
 
     @Delete
-    fun delete(account: Account)
+    suspend fun delete(account: Account)
 }

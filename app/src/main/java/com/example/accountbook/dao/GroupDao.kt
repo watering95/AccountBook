@@ -2,18 +2,22 @@ package com.example.accountbook.dao
 
 import androidx.room.*
 import com.example.accountbook.data.Group
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface GroupDao {
-    @Query("SELECT * FROM group")
-    fun getAll(): List<Group>
+    @Query("SELECT * from tbl_group")
+    fun getAll(): Flow<List<Group>>
 
-    @Insert
-    fun insert(group: Group)
+    @Query("DELETE from tbl_group")
+    suspend fun deleteAll()
 
-    @Update
-    fun update(group: Group)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insert(group: Group)
+
+    @Update(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun update(group: Group)
 
     @Delete
-    fun delete(goup: Group)
+    suspend fun delete(group: Group)
 }
