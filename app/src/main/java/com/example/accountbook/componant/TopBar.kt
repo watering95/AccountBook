@@ -6,9 +6,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Save
 import androidx.compose.runtime.*
 
 @Composable
@@ -24,7 +22,7 @@ fun MainTopBar(title: String = "", onButtonNavigationClicked: () -> Unit) {
 }
 
 @Composable
-fun SettingTopBar(title: String = "", onButtonNavigationClicked: () -> Unit, onButtonSaveClicked: () -> Unit, onButtonDeleteClicked: () -> Unit) {
+fun SettingTopBar(title: String = "", onButtonNavigationClicked: () -> Unit, onButtonAddClicked: () -> Unit = {}) {
     TopAppBar(
         title = { Text(text = title) },
         navigationIcon = {
@@ -33,7 +31,7 @@ fun SettingTopBar(title: String = "", onButtonNavigationClicked: () -> Unit, onB
             }
         },
         actions = {
-            IconButton(onClick = { onButtonSaveClicked() }) {
+            IconButton(onClick = { onButtonAddClicked() }) {
                 Icon(Icons.Filled.Add, "Add")
             }
         }

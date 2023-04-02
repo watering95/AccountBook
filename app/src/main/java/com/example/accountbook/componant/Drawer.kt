@@ -8,11 +8,11 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.accountbook.drawerBodies
-import com.example.accountbook.drawerHeads
 
 @Composable
 fun Drawer(
+    drawerHeads: List<String>,
+    drawerBodies: List<String>,
     itemClick: (String) -> Unit
 ) {
     Column() {

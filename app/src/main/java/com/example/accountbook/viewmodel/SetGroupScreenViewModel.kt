@@ -10,15 +10,19 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class SetGroupScreenViewModel(private val repository: GroupRepositoryImpl) : ViewModel() {
+    private val _title = mutableStateOf("Set Group")
     private var _listOfGroup: MutableStateFlow<List<Group>> = MutableStateFlow(emptyList())
     private var _checked: MutableStateFlow<List<Boolean>> = MutableStateFlow(emptyList())
     private val _aCardIsLongPressed = mutableStateOf(false)
     private val _aCardIsTaped = mutableStateOf(false)
+    private val _selectedGroup = mutableStateOf(Group(name = "", use = false))
 
+    val title : State<String> = _title
     val listOfGroup = _listOfGroup
     val checked = _checked
     val aCardIsLongPressed = _aCardIsLongPressed
     val aCardIsTaped = _aCardIsTaped
+    val selectedGroup = _selectedGroup
 
     init {
         viewModelScope.launch {
@@ -29,16 +33,22 @@ class SetGroupScreenViewModel(private val repository: GroupRepositoryImpl) : Vie
         }
 
     }
+
     fun aCardIsLongPressed() {
         _aCardIsLongPressed.value = !_aCardIsLongPressed.value
     }
 
-    fun aCardIsTaped() {
+    fun aCardIsTaped(group: Group = _selectedGroup.value) {
+        _selectedGroup.value = group
         (!_aCardIsTaped.value).also { _aCardIsTaped.value = it }
     }
 
     fun insert(group: Group) = viewModelScope.launch {
         repository.insert(group)
+    }
+
+    fun update(group: Group) = viewModelScope.launch {
+        repository.update(group)
     }
 }
 

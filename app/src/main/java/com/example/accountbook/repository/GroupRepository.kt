@@ -9,8 +9,10 @@ import kotlinx.coroutines.flow.Flow
 interface GroupRepository {
     val allGroups: Flow<List<Group>>
     suspend fun insert(group: Group)
+    suspend fun update(group: Group)
 }
 class GroupRepositoryImpl(private val db : AppRoomDatabase): GroupRepository {
     override val allGroups: Flow<List<Group>> = db.groupDao().getAll()
     override suspend fun insert(group: Group) = db.groupDao().insert(group)
+    override suspend fun update(group: Group) = db.groupDao().update(group)
 }

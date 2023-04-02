@@ -2,11 +2,12 @@ package com.example.accountbook.dao
 
 import androidx.room.*
 import com.example.accountbook.data.Account
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AccountDao {
     @Query("SELECT * FROM tbl_Account")
-    fun getAll(): List<Account>
+    fun getAll(): Flow<List<Account>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(account: Account)
