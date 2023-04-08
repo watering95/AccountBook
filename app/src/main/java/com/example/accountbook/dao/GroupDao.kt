@@ -20,4 +20,7 @@ interface GroupDao {
 
     @Delete
     suspend fun delete(group: Group)
+
+    @Delete
+    suspend fun delete(vararg groups: Group)
 }

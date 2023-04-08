@@ -20,7 +20,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.accountbook.AppRoomDatabase
 import com.example.accountbook.componant.Drawer
 import com.example.accountbook.componant.ScreenValue
-import com.example.accountbook.componant.SettingTopBar
+import com.example.accountbook.componant.TopBarWithAdd
+import com.example.accountbook.componant.TopBarWithDelete
 import com.example.accountbook.data.Group
 import com.example.accountbook.drawerBodies
 import com.example.accountbook.drawerHeads
@@ -28,6 +29,7 @@ import com.example.accountbook.viewmodel.SetGroupScreenViewModel
 import com.example.accountbook.viewmodel.SetGroupScreenViewModelFactory
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 @Composable
 fun SetGroupScreen(
@@ -37,32 +39,56 @@ fun SetGroupScreen(
         factory = SetGroupScreenViewModelFactory(db)
     )
 ) {
-    val groups by viewModel.listOfGroup.collectAsState(initial = emptyList())
-    val checked by viewModel.checked.collectAsState(initial = emptyList())
+    val groups = viewModel.listOfGroup.collectAsState(initial = emptyList())
 
-    SetGroupScreen(screenValue = screenValue, groups = groups, checked = checked)
+    SetGroupScreen(screenValue = screenValue, groups = groups.value)
 }
 
 @Composable
 fun SetGroupScreen(
     screenValue: ScreenValue,
     groups: List<Group>,
-    checked: List<Boolean>,
     viewModel: SetGroupScreenViewModel = viewModel()
 ) {
     val navController = screenValue.navController
     val scaffoldState = screenValue.scaffoldState
     val coroutineScope = screenValue.coroutineScope
     val openDrawer = screenValue.openDrawer
-    val addGroup = { viewModel.aCardIsTaped() }
+    val addGroup = {
+        viewModel.clearSelectedGroup()
+        viewModel.aCardIsTaped()
+    }
+    val deleteGroups: ()-> Unit = {
+        var selected = arrayOf<Group>()
+        val iterator = viewModel.checkedCards.value.iterator()
+        var index = 0
+        while(iterator.hasNext()) {
+            if(iterator.next()) {
+                val new = selected.plus(groups[index])
+                selected = new
+            }
+            index++
+        }
+        viewModel.delete(selected)
+        viewModel.aCardIsLongPressed()
+    }
 
     Scaffold (
         scaffoldState = scaffoldState,
-        topBar = { SettingTopBar(
-            title = viewModel.title.value,
-            onButtonNavigationClicked = openDrawer,
-            onButtonAddClicked =  addGroup
-        ) },
+        topBar = {
+            if(viewModel.aCardIsLongPressed.value)
+                TopBarWithDelete(
+                    title = viewModel.title.value,
+                    onButtonNavigationClicked = openDrawer,
+                    onButtonDeleteClicked = deleteGroups
+                )
+            else
+                TopBarWithAdd(
+                    title = viewModel.title.value,
+                    onButtonNavigationClicked = openDrawer,
+                    onButtonAddClicked =  addGroup
+                )
+        },
         drawerContent = {
             Drawer(
                 drawerBodies = drawerBodies,
@@ -89,32 +115,38 @@ fun SetGroupScreen(
                 .padding(it)
                 .background(MaterialTheme.colors.primary)
         ) {
-            LazyVerticalGrid(
-                columns = GridCells.Adaptive(minSize = 256.dp)
-            ) {
-                items(groups) { item ->
-                    val index = groups.indexOf(item)
-
-                    GroupCard(
-                        item = item,
-                        checked = checked[index],
-                    ) {
-
-                    }
-                }
-            }
+            ShowGroups()
             if(viewModel.aCardIsTaped.value) EditGroupCardDialog()
         }
     }
 }
 
 @Composable
-fun GroupCard(
-    item: Group,
-    checked: Boolean?,
-    viewModel: SetGroupScreenViewModel = viewModel(),
-    onCheckedChangeACheckBox: (Boolean) -> Unit) {
+fun ShowGroups(
+    viewModel: SetGroupScreenViewModel = viewModel()
+) {
+    val groups = viewModel.listOfGroup.collectAsState(initial = emptyList())
 
+    LazyVerticalGrid(
+        columns = GridCells.Adaptive(minSize = 256.dp)
+    ) {
+        items(groups.value) { item ->
+            val group = remember { mutableStateOf(item) }
+            val index = remember { mutableStateOf(groups.value.indexOf(item)) }
+            val checkMode = remember {mutableStateOf(false)}
+
+            GroupCard(index = index.value, item = group.value, checkMode = checkMode)
+        }
+    }
+}
+
+@Composable
+fun GroupCard(
+    index: Int,
+    item: Group,
+    checkMode: MutableState<Boolean>,
+    viewModel: SetGroupScreenViewModel = viewModel()
+) {
     Card(
         Modifier
             .border(width = 1.dp, color = Color.Black)
@@ -128,14 +160,20 @@ fun GroupCard(
     ) {
         Row {
             Text(item.name)
-            if(viewModel.aCardIsLongPressed.value) checked?.let { Checkbox(checked = it, onCheckedChange = onCheckedChangeACheckBox) }
+            if(viewModel.aCardIsLongPressed.value) Checkbox(
+                checked = checkMode.value,
+                onCheckedChange = {
+                    checkMode.value = it
+                    viewModel.checkedACard(index, it)
+                }
+            ) else checkMode.value = false
         }
     }
 }
 @Composable
 fun EditGroupCardDialog(
-    viewModel: SetGroupScreenViewModel = viewModel(),
-    ) {
+    viewModel: SetGroupScreenViewModel = viewModel()
+) {
     Dialog(onDismissRequest = { viewModel.aCardIsTaped() }) {
         Surface(
             modifier = Modifier
@@ -146,7 +184,6 @@ fun EditGroupCardDialog(
             Column(modifier = Modifier.padding(all = 16.dp)) {
                 val group = viewModel.selectedGroup.value
                 var text by remember {mutableStateOf(group.name)}
-                Log.d("Test","${group.uid}")
                 val addGroup = {
                     group.use = true
                     group.name = text
