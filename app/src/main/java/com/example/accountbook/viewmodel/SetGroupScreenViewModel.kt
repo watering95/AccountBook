@@ -1,6 +1,5 @@
 package com.example.accountbook.viewmodel
 
-import android.util.Log
 import androidx.compose.runtime.*
 import androidx.lifecycle.*
 import com.example.accountbook.AppRoomDatabase
@@ -12,47 +11,45 @@ import kotlinx.coroutines.launch
 
 class SetGroupScreenViewModel(private val repository: GroupRepositoryImpl) : ViewModel() {
     private val _title = mutableStateOf("Set Group")
-    private var _listOfGroup: MutableStateFlow<List<Group>> = MutableStateFlow(emptyList())
+    private val _initItem = Group(name = "")
+
+    private var _listOfItem: MutableStateFlow<List<Group>> = MutableStateFlow(emptyList())
     private val _checkedCards: MutableStateFlow<MutableList<Boolean>> = MutableStateFlow(mutableListOf())
     private val _aCardIsLongPressed = mutableStateOf(false)
     private val _aCardIsTaped = mutableStateOf(false)
-    private val _selectedGroup = mutableStateOf(Group(name = "", use = false))
+    private val _selectedItem = mutableStateOf(_initItem)
 
     val title : State<String> = _title
-    val listOfGroup = _listOfGroup
+    val listOfItems = _listOfItem
     val checkedCards = _checkedCards
     val aCardIsLongPressed = _aCardIsLongPressed
     val aCardIsTaped = _aCardIsTaped
-    val selectedGroup = _selectedGroup
+    val selectedItem = _selectedItem
 
     init {
-        getAllGroups()
+        getAllItems()
     }
 
-    fun getAllGroups() {
+    private fun getAllItems() {
         viewModelScope.launch {
             repository.allGroups.collectLatest {
-                _listOfGroup.value = it
+                _listOfItem.value = it
                 _checkedCards.value = MutableList(it.size) {false}
             }
         }
     }
     fun aCardIsLongPressed() {
-        _checkedCards.value = MutableList(_listOfGroup.value.size) {false}
+        _checkedCards.value = MutableList(_listOfItem.value.size) {false}
         _aCardIsLongPressed.value = !_aCardIsLongPressed.value
     }
 
-    fun aCardIsTaped(group: Group = _selectedGroup.value) {
-        _selectedGroup.value = group
+    fun aCardIsTaped(group: Group = _selectedItem.value) {
+        _selectedItem.value = group
         (!_aCardIsTaped.value).also { _aCardIsTaped.value = it }
     }
 
     fun checkedACard(index: Int, checked: Boolean) {
         _checkedCards.value[index] = checked
-    }
-
-    fun clearSelectedGroup() {
-        _selectedGroup.value = Group(name = "", use = false)
     }
 
     fun insert(group: Group) = viewModelScope.launch {

@@ -25,7 +25,9 @@ fun Spinner(
         Column {
             OutlinedTextField(
                 value = selected,
-                modifier = Modifier.width(screenWidth.dp / 2).height(60.dp),
+                modifier = Modifier
+                    .width(screenWidth.dp / 2)
+                    .height(60.dp),
                 onValueChange = {})
             DropdownMenu(
                 expanded = expanded,
@@ -37,6 +39,7 @@ fun Spinner(
                         onClick = {
                             selected = entry
                             expanded = false
+                            onSelectionChanged(selected)
                         }
                     ) {
                         Text(
@@ -47,7 +50,8 @@ fun Spinner(
             }
         }
         Spacer(
-            modifier = Modifier.matchParentSize()
+            modifier = Modifier
+                .matchParentSize()
                 .background(Color.Transparent)
                 .padding(10.dp)
                 .clickable(

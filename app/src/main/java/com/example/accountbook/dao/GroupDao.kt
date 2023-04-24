@@ -9,6 +9,9 @@ interface GroupDao {
     @Query("SELECT * from tbl_group")
     fun getAll(): Flow<List<Group>>
 
+    @Query("SELECT * from tbl_group WHERE uid = :id")
+    suspend fun get(id: Int): Group
+
     @Query("DELETE from tbl_group")
     suspend fun deleteAll()
 

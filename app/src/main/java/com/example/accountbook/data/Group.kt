@@ -7,6 +7,5 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "tbl_group")
 data class Group(
     @PrimaryKey(autoGenerate = true) val uid: Int = 0,
-    @ColumnInfo(name = "name") var name: String,
-    @ColumnInfo(name = "use") var use: Boolean
+    @ColumnInfo(name = "name") var name: String
 )

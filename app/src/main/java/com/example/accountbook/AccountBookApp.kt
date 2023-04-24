@@ -38,11 +38,14 @@ fun AccountBookNavHost(
     NavHost(navController = screenValue.navController, startDestination = NavItem.MainScreen.route) {
         drawerHeads.forEach { route ->
             composable(route) {
+                val db = (LocalContext.current as MainActivity).db
+
                 viewModel.changeTitle(route)
+
                 when (route) {
                     NavItem.MainScreen.route -> MainScreen(screenValue)
-                    "Set Group" -> SetGroupScreen((LocalContext.current as MainActivity).db, screenValue)
-                    "Set Account" -> SetAccountScreen((LocalContext.current as MainActivity).db, screenValue)
+                    "Set Group" -> SetGroupScreen(db, screenValue)
+                    "Set Account" -> SetAccountScreen(db, screenValue)
                     "Set Card" -> SetCardScreen()
                     "Set Category" -> SetCategoryScreen()
                 }

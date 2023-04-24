@@ -2,6 +2,7 @@ package com.example.accountbook.dao
 
 import androidx.room.*
 import com.example.accountbook.data.Account
+import com.example.accountbook.data.Group
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -17,4 +18,7 @@ interface AccountDao {
 
     @Delete
     suspend fun delete(account: Account)
+
+    @Delete
+    suspend fun delete(vararg accounts: Account)
 }

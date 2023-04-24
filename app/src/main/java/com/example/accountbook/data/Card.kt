@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "tbl_Card")
 data class Card(
-    @PrimaryKey val uid: Int,
+    @PrimaryKey(autoGenerate = true) val uid: Int = 0,
     @ColumnInfo(name = "name") val name: String,
     @ColumnInfo(name = "company") val company: String,
     @ColumnInfo(name = "number") val number: String,

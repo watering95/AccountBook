@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "tbl_Value")
 data class Value(
-    @PrimaryKey val uid: Int,
+    @PrimaryKey(autoGenerate = true) val uid: Int = 0,
     @ColumnInfo(name = "idAccount") val idAccount: Int,
     @ColumnInfo(name = "date") val date: String,
     @ColumnInfo(name = "price") val price: Int
