@@ -45,14 +45,14 @@ fun BookScreen() {
         Text("Daily Spending")
         LazyRow {
             items(listSpending) { item ->
-                AccountCard(item)
+                SpendingCard(item)
             }
         }
 
         Text("Daily Income")
         LazyRow {
             items(listIncome) { item ->
-                AccountCard(item)
+                IncomeCard(item)
             }
         }
     }

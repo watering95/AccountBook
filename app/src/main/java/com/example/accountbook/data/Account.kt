@@ -10,7 +10,7 @@ data class Account(
     @ColumnInfo(name = "name") var name: String,
     @ColumnInfo(name = "company") var company: String,
     @ColumnInfo(name = "number") var number: String,
-    @ColumnInfo(name = "idGroup") var idGroup: Int?,
+    @ColumnInfo(name = "idGroup") var idGroup: Int,
     @ColumnInfo(name = "idPayment") var idPayment: Int,
     @ColumnInfo(name = "use") var use: Boolean
 )

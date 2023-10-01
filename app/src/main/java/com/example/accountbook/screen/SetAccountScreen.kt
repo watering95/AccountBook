@@ -1,6 +1,5 @@
 package com.example.accountbook.screen
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -30,7 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -64,9 +63,9 @@ fun SetAccountScreen(
         factory = SetAccountScreenViewModelFactory(db)
     )
 ) {
-    val accounts = viewModel.listOfItems.collectAsState()
+    val accounts by viewModel.listOfItems.collectAsState()
 
-    ItemScreen(screenValue = screenValue, items = accounts.value)
+    ItemScreen(screenValue = screenValue, items = accounts)
 }
 @Composable
 fun ItemScreen(
@@ -143,7 +142,7 @@ fun ItemScreen(
                 .padding(it)
                 .background(MaterialTheme.colors.primary)
         ) {
-            ShowItemCards()
+            ShowItemCards(items)
             if(viewModel.aCardIsTaped.value) ItemEditDialog()
         }
     }
@@ -151,10 +150,8 @@ fun ItemScreen(
 
 @Composable
 private fun ShowItemCards(
-    viewModel: SetAccountScreenViewModel = viewModel()
+    items: List<Account>,
 ) {
-    val items = viewModel.listOfItems.collectAsState()
-
     CardListTheme {
         // A surface container using the 'background' color from the theme
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
@@ -164,12 +161,12 @@ private fun ShowItemCards(
                 verticalArrangement = Arrangement.spacedBy(4.dp),
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                items(items.value) { item ->
-                    val account = remember { mutableStateOf(item) }
-                    val index = remember { mutableStateOf(items.value.indexOf(item)) }
+                items(items) { item ->
+                    val account by remember { mutableStateOf(item) }
+                    val index by remember { mutableIntStateOf(items.indexOf(item)) }
                     val checkMode = remember { mutableStateOf(false) }
 
-                    ItemCard(index = index.value, item = account.value, checkMode = checkMode)
+                    ItemCard(index = index, item = account, checkMode = checkMode)
                 }
             }
         }
@@ -228,7 +225,7 @@ fun ItemCard(
 private fun ItemEditDialog(
     viewModel: SetAccountScreenViewModel = viewModel()
 ) {
-    val groups = viewModel.listOfGroups.collectAsState()
+    val groups by viewModel.listOfGroups.collectAsState()
 
     Dialog(onDismissRequest = { viewModel.aCardIsTaped() }) {
         Surface(
@@ -239,27 +236,26 @@ private fun ItemEditDialog(
         ) {
             Column(modifier = Modifier.padding(all = 16.dp)) {
                 val account = viewModel.selectedItem.value
+                val selectedGroup = viewModel.selectedGroup.collectAsState()
+                val list = mutableListOf("No Group")
+                groups.forEach { group ->
+                    list.add(group.name)
+                }
                 var name by remember { mutableStateOf(account.name) }
                 var company by remember { mutableStateOf(account.company) }
                 var number by remember { mutableStateOf(account.number) }
-                val idGroup = remember { mutableStateOf(account.idGroup) }
-                val preSelected = remember {
-                    mutableStateOf(
-                        if(account.idGroup == null || account.idGroup == 0) "No Group"
-                        else viewModel.getGroup(account.idGroup!!).name
-                    )
-                }
+                var idGroup = account.idGroup
+                val preSelected =
+                        if(idGroup == -1) "No Group"
+                        else selectedGroup.value.name
+
                 val saveItem = {
                     account.name = name
                     account.company = company
                     account.number = number
-                    account.idGroup = idGroup.value
+                    account.idGroup = idGroup
                     if(account.uid == 0) viewModel.insert(account) else viewModel.update(account)
                     viewModel.aCardIsTaped()
-                }
-                val list = mutableListOf("No Group")
-                groups.value.forEach { group ->
-                    list.add(group.name)
                 }
 
                 Text("Account Name")
@@ -283,9 +279,9 @@ private fun ItemEditDialog(
                 Text("Group")
                 Spinner(
                     list = list,
-                    preselected = preSelected.value,
+                    preselected = preSelected,
                     onSelectionChanged = { selected ->
-                        idGroup.value = if(selected == "No Group") null else groups.value[list.indexOf(selected) - 1].uid
+                        idGroup = if(selected == "No Group") -1 else groups[list.indexOf(selected) - 1].uid
                     }
                 )
                 Row {

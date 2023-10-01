@@ -46,8 +46,8 @@ fun AccountBookNavHost(
                     NavItem.MainScreen.route -> MainScreen(screenValue)
                     "Set Group" -> SetGroupScreen(db, screenValue)
                     "Set Account" -> SetAccountScreen(db, screenValue)
-                    "Set Card" -> SetCardScreen()
-                    "Set Category" -> SetCategoryScreen()
+                    "Set Card" -> SetCardScreen(db, screenValue)
+                    "Set Category" -> SetCategoryScreen(db, screenValue)
                 }
             }
         }

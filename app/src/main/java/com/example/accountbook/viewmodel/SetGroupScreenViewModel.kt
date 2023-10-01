@@ -15,9 +15,9 @@ class SetGroupScreenViewModel(private val repository: GroupRepositoryImpl) : Vie
 
     private var _listOfItem: MutableStateFlow<List<Group>> = MutableStateFlow(emptyList())
     private val _checkedCards: MutableStateFlow<MutableList<Boolean>> = MutableStateFlow(mutableListOf())
-    private val _aCardIsLongPressed = mutableStateOf(false)
-    private val _aCardIsTaped = mutableStateOf(false)
-    private val _selectedItem = mutableStateOf(_initItem)
+    private var _aCardIsLongPressed = mutableStateOf(false)
+    private var _aCardIsTaped = mutableStateOf(false)
+    private var _selectedItem = mutableStateOf(_initItem)
 
     val title : State<String> = _title
     val listOfItems = _listOfItem

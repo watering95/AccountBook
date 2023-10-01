@@ -10,6 +10,9 @@ interface AccountDao {
     @Query("SELECT * FROM tbl_Account")
     fun getAll(): Flow<List<Account>>
 
+    @Query("SELECT * from tbl_Account WHERE uid = :id")
+    suspend fun get(id: Int): Account
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(account: Account)
 

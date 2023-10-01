@@ -10,20 +10,35 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.accountbook.AppRoomDatabase
 import com.example.accountbook.componant.Spinner
+import com.example.accountbook.data.Account
+import com.example.accountbook.viewmodel.HomeScreenViewModel
+import com.example.accountbook.viewmodel.HomeScreenViewModelFactory
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+    db: AppRoomDatabase,
+    viewModel: HomeScreenViewModel = viewModel(
+        factory = HomeScreenViewModelFactory(db)
+    )
+) {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Top
     ) {
         Column {
-            val listGroup = listOf("A", "B", "C")
-            val listAccounts = listOf("1", "2", "3", "4", "5", "6")
+            val groups by viewModel.listOfGroups.collectAsState()
+            val accounts by viewModel.listOfAccounts.collectAsState()
+
+            val listGroup = mutableListOf("Total")
+            groups.forEach { group ->
+                listGroup.add(group.name)
+            }
 
             Row {
-                Spinner(list = listGroup, preselected = listGroup[2], onSelectionChanged = {})
+                Spinner(list = listGroup, preselected = listGroup[0], onSelectionChanged = {})
                 Column {
                     Row {
                         Text("총자산")
@@ -41,18 +56,24 @@ fun HomeScreen() {
             }
 
             Card(
-                Modifier.border(1.dp,Color.Blue).fillMaxWidth().height(200.dp)
+                Modifier
+                    .border(1.dp, Color.Blue)
+                    .fillMaxWidth()
+                    .height(200.dp)
             ) {}
 
             Text("계좌")
             LazyRow {
-                items(listAccounts) { item ->
+                items(accounts) { item ->
                     AccountCard(item)
                 }
             }
 
             Card(
-                Modifier.border(1.dp,Color.Red).fillMaxWidth().height(200.dp)
+                Modifier
+                    .border(1.dp, Color.Red)
+                    .fillMaxWidth()
+                    .height(200.dp)
             ) {}
 //        val tabTitles = listOf("List", "Chart")
 //        var tabIndex by remember { mutableStateOf(0) }
@@ -74,10 +95,17 @@ fun HomeScreen() {
 }
 
 @Composable
-fun AccountCard(item: String) {
+fun AccountCard(item: Account) {
     Card(
-        Modifier.border(width = 1.dp, color= Color.Black).width(100.dp).height(100.dp)
+        Modifier
+            .border(width = 1.dp, color = Color.Black)
+            .width(100.dp)
+            .height(100.dp)
     ) {
-        Text(item)
+        Column {
+            Text(item.name)
+            Text(item.company)
+            Text(item.number)
+        }
     }
 }

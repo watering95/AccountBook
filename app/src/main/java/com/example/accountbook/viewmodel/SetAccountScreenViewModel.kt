@@ -14,14 +14,14 @@ import kotlinx.coroutines.withContext
 
 class SetAccountScreenViewModel(private val repository: AccountRepositoryImpl) : ViewModel() {
     private val _title = mutableStateOf("Set Account")
-    private val _initItem = Account(name="", company = "", number = "", idPayment = -1,use = false, idGroup = null)
+    private val _initItem = Account(name="", company = "", number = "", idPayment = -1,use = false, idGroup = -1)
     private val _initGroup = Group(name="")
 
     private var _listOfItems: MutableStateFlow<List<Account>> = MutableStateFlow(emptyList())
     private val _aCardIsLongPressed = mutableStateOf(false)
     private val _aCardIsTaped = mutableStateOf(false)
     private val _checkedCards: MutableStateFlow<MutableList<Boolean>> = MutableStateFlow(mutableListOf())
-    private val _selectedItem = mutableStateOf(_initItem)
+    private var _selectedItem = mutableStateOf(_initItem)
     private val _selectedGroup: MutableStateFlow<Group> = MutableStateFlow(_initGroup)
 
     val title : State<String> = _title
@@ -30,8 +30,8 @@ class SetAccountScreenViewModel(private val repository: AccountRepositoryImpl) :
     val aCardIsLongPressed = _aCardIsLongPressed
     val aCardIsTaped = _aCardIsTaped
     val selectedItem = _selectedItem
+    val selectedGroup = _selectedGroup
     val listOfGroups: MutableStateFlow<List<Group>> = MutableStateFlow(emptyList())
-
 
     init {
         getAllItems()
@@ -54,24 +54,23 @@ class SetAccountScreenViewModel(private val repository: AccountRepositoryImpl) :
         }
     }
 
-    fun getGroup(id: Int): Group {
+    private fun getGroup(id: Int) {
         viewModelScope.launch {
             withContext(Dispatchers.Default) {
                 _selectedGroup.value = repository.getGroup(id)
             }
         }
-        return _selectedGroup.value
+    }
+
+    fun aCardIsTaped(account: Account = _selectedItem.value) {
+        _selectedItem.value = account
+        getGroup(account.idGroup)
+        (!_aCardIsTaped.value).also { _aCardIsTaped.value = it }
     }
 
     fun aCardIsLongPressed() {
         _checkedCards.value = MutableList(_listOfItems.value.size) {false}
         _aCardIsLongPressed.value = !_aCardIsLongPressed.value
-    }
-
-    fun aCardIsTaped(account: Account = _selectedItem.value) {
-        _selectedItem.value = account
-        account.idGroup?.let { getGroup(it) }
-        (!_aCardIsTaped.value).also { _aCardIsTaped.value = it }
     }
 
     fun checkedACard(index: Int, checked: Boolean) {
@@ -80,7 +79,6 @@ class SetAccountScreenViewModel(private val repository: AccountRepositoryImpl) :
 
     fun clearSelectedCards() {
         _selectedItem.value = _initItem
-        _selectedGroup.value = _initGroup
     }
 
     fun insert(account: Account) = viewModelScope.launch {

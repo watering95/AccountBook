@@ -38,11 +38,12 @@ fun SetGroupScreen(
         factory = SetGroupScreenViewModelFactory(db)
     )
 ) {
-    val items = viewModel.listOfItems.collectAsState()
+    val items by viewModel.listOfItems.collectAsState()
 
-    ItemScreen(screenValue = screenValue, items = items.value)
+    ItemScreen(screenValue = screenValue, items)
 }
 
+// 화면 구성
 @Composable
 fun ItemScreen(
     screenValue: ScreenValue,
@@ -113,18 +114,17 @@ fun ItemScreen(
                 .padding(it)
                 .background(MaterialTheme.colors.primary)
         ) {
-            ShowItemCards()
+            ShowItemCards(items)
             if(viewModel.aCardIsTaped.value) ItemEditDialog()
         }
     }
 }
 
+// 리스트 보여주기
 @Composable
 private fun ShowItemCards(
-    viewModel: SetGroupScreenViewModel = viewModel()
+    items: List<Group>
 ) {
-    val items = viewModel.listOfItems.collectAsState(initial = emptyList())
-
     CardListTheme {
         // A surface container using the 'background' color from the theme
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
@@ -134,18 +134,19 @@ private fun ShowItemCards(
                 verticalArrangement = Arrangement.spacedBy(4.dp),
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                items(items.value) { item ->
-                    val group = remember { mutableStateOf(item) }
-                    val index = remember { mutableStateOf(items.value.indexOf(item)) }
+                items(items) { item ->
+                    val group by remember { mutableStateOf(item) }
+                    val index by remember { mutableIntStateOf(items.indexOf(item)) }
                     val checkMode = remember {mutableStateOf(false)}
 
-                    ItemCard(index = index.value, item = group.value, checkMode = checkMode)
+                    ItemCard(index = index, item = group, checkMode = checkMode)
                 }
             }
         }
     }
 }
 
+// 카드에 아이템 정보 표시
 @Composable
 fun ItemCard(
     index: Int,
@@ -194,6 +195,7 @@ fun ItemCard(
     }
 }
 
+// 선택된 아이템 정보 편집 화면
 @Composable
 private fun ItemEditDialog(
     viewModel: SetGroupScreenViewModel = viewModel()
@@ -207,9 +209,9 @@ private fun ItemEditDialog(
         ) {
             Column(modifier = Modifier.padding(all = 16.dp)) {
                 val group = viewModel.selectedItem.value
-                var text by remember {mutableStateOf(group.name)}
+                var name by remember {mutableStateOf(group.name)}
                 val saveItem = {
-                    group.name = text
+                    group.name = name
                     if(group.uid == 0) viewModel.insert(group) else viewModel.update(group)
                     viewModel.aCardIsTaped()
                 }
@@ -218,8 +220,8 @@ private fun ItemEditDialog(
                 TextField(
                     modifier = Modifier
                         .fillMaxWidth(),
-                    value = text,
-                    onValueChange = {text = it})
+                    value = name,
+                    onValueChange = {name = it})
                 Row {
                     Button(
                         modifier = Modifier.weight(1f),
