@@ -9,19 +9,19 @@ import androidx.compose.runtime.*
 
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.accountbook.AppRoomDatabase
 import com.example.accountbook.componant.Spinner
 import com.example.accountbook.data.Account
+import com.example.accountbook.viewmodel.AccountBookAppViewModelFactory
 import com.example.accountbook.viewmodel.HomeScreenViewModel
-import com.example.accountbook.viewmodel.HomeScreenViewModelFactory
 
 @Composable
 fun HomeScreen(
-    db: AppRoomDatabase,
     viewModel: HomeScreenViewModel = viewModel(
-        factory = HomeScreenViewModelFactory(db)
+        factory = AccountBookAppViewModelFactory(AppRoomDatabase.getInstance(LocalContext.current, rememberCoroutineScope()))
     )
 ) {
     Column(
@@ -74,7 +74,8 @@ fun HomeScreen(
                     .border(1.dp, Color.Red)
                     .fillMaxWidth()
                     .height(200.dp)
-            ) {}
+            ) {
+            }
 //        val tabTitles = listOf("List", "Chart")
 //        var tabIndex by remember { mutableStateOf(0) }
 

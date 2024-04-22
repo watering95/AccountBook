@@ -8,15 +8,18 @@ import com.example.accountbook.dao.*
 import com.example.accountbook.data.*
 import kotlinx.coroutines.CoroutineScope
 
-@Database(entities = [Transaction::class, Account::class, Card::class, Group::class, Value::class, Category::class, Payment::class], version = 1, exportSchema = false)
+@Database(
+    entities = [Transaction::class, Account::class, CreditCard::class, Group::class, Category::class,AccountLog::class],
+//  views = [],
+    version = 1, exportSchema = false
+)
 abstract class AppRoomDatabase : RoomDatabase() {
     abstract fun groupDao(): GroupDao
     abstract fun transactionDao(): TransactionDao
     abstract fun accountDao(): AccountDao
-    abstract fun cardDao(): CardDao
-    abstract fun valueDao(): ValueDao
+    abstract fun creditCardDao(): CreditCardDao
     abstract fun categoryDao(): CategoryDao
-    abstract fun PaymentDao(): PaymentDao
+    abstract fun accountLogDao(): AccountLogDao
 
     companion object {
         @Volatile

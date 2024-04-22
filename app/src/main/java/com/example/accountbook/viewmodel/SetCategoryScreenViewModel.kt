@@ -2,7 +2,6 @@ package com.example.accountbook.viewmodel
 
 import androidx.compose.runtime.*
 import androidx.lifecycle.*
-import com.example.accountbook.AppRoomDatabase
 import com.example.accountbook.data.Category
 import com.example.accountbook.repository.CategoryRepositoryImpl
 import kotlinx.coroutines.Dispatchers
@@ -59,7 +58,7 @@ class SetCategoryScreenViewModel(private val repository: CategoryRepositoryImpl)
                 val parentCategory = repository.getCategory(category.pid)
                 preSelected0.value = when (category.depth) {
                     1 -> parentCategory.name
-                    2 -> if (parentCategory.pid != -1) repository.getCategory(parentCategory.pid).name else ""
+                    2 -> if (parentCategory.pid != -1L) repository.getCategory(parentCategory.pid).name else ""
                     else -> ""
                 }
                 preSelected1.value = when (category.depth) {
@@ -84,7 +83,7 @@ class SetCategoryScreenViewModel(private val repository: CategoryRepositoryImpl)
 
     fun aCardIsTaped(category: Category = _selectedItem.value) {
         _selectedItem.value = category
-        if(category.pid != -1) getPreSelectedParent(category)
+        if(category.pid != -1L) getPreSelectedParent(category)
         (!_aCardIsTaped.value).also { _aCardIsTaped.value = it }
     }
 
@@ -117,17 +116,5 @@ class SetCategoryScreenViewModel(private val repository: CategoryRepositoryImpl)
     }
     fun delete(array: Array<Category>) = viewModelScope.launch {
         repository.delete(array)
-    }
-}
-
-class SetCategoryScreenViewModelFactory(private val db: AppRoomDatabase) : ViewModelProvider.Factory {
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if(modelClass.isAssignableFrom(SetCategoryScreenViewModel::class.java)) {
-            val repository = CategoryRepositoryImpl(db)
-            return SetCategoryScreenViewModel(repository) as T
-        } else {
-            throw IllegalArgumentException("Failed to create ViewModel : ${modelClass.name}")
-        }
     }
 }

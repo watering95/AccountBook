@@ -2,15 +2,12 @@ package com.example.accountbook.repository
 
 import com.example.accountbook.AppRoomDatabase
 import com.example.accountbook.data.Account
-import com.example.accountbook.data.Group
 import kotlinx.coroutines.flow.Flow
 
-interface HomeRepository {
+interface AccountBookRepository {
     val allAccounts: Flow<List<Account>>
-    val allGroups: Flow<List<Group>>
 }
 
-class HomeRepositoryImpl(db : AppRoomDatabase): HomeRepository {
+class AccountBookRepositoryImpl(db: AppRoomDatabase) : AccountBookRepository {
     override val allAccounts: Flow<List<Account>> = db.accountDao().getAll()
-    override val allGroups: Flow<List<Group>> = db.groupDao().getAll()
 }

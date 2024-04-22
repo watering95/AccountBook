@@ -2,7 +2,6 @@ package com.example.accountbook.viewmodel
 
 import androidx.compose.runtime.*
 import androidx.lifecycle.*
-import com.example.accountbook.AppRoomDatabase
 import com.example.accountbook.data.Group
 import com.example.accountbook.repository.GroupRepositoryImpl
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -65,17 +64,5 @@ class SetGroupScreenViewModel(private val repository: GroupRepositoryImpl) : Vie
     }
     fun delete(array: Array<Group>) = viewModelScope.launch {
         repository.delete(array)
-    }
-}
-
-class SetGroupScreenViewModelFactory(private val db: AppRoomDatabase) : ViewModelProvider.Factory {
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if(modelClass.isAssignableFrom(SetGroupScreenViewModel::class.java)) {
-            val repository = GroupRepositoryImpl(db)
-            return SetGroupScreenViewModel(repository) as T
-        } else {
-            throw IllegalArgumentException("Failed to create ViewModel : ${modelClass.name}")
-        }
     }
 }

@@ -12,10 +12,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.compose.material.BottomNavigation
-import androidx.navigation.compose.rememberNavController
 import com.example.accountbook.R
 
-val bottomScreens = listOf(NavItem.HomeScreen, NavItem.BookScreen)
+val bottomScreens = listOf(NavItemBottom.HomeScreen, NavItemBottom.BookScreen)
 
 @Composable
 fun BottomNavigation(navController: NavController) {

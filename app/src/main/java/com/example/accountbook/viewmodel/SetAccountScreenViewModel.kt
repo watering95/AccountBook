@@ -2,7 +2,6 @@ package com.example.accountbook.viewmodel
 
 import androidx.compose.runtime.*
 import androidx.lifecycle.*
-import com.example.accountbook.AppRoomDatabase
 import com.example.accountbook.data.Account
 import com.example.accountbook.data.Group
 import com.example.accountbook.repository.AccountRepositoryImpl
@@ -14,7 +13,7 @@ import kotlinx.coroutines.withContext
 
 class SetAccountScreenViewModel(private val repository: AccountRepositoryImpl) : ViewModel() {
     private val _title = mutableStateOf("Set Account")
-    private val _initItem = Account(name="", company = "", number = "", idPayment = -1,use = false, idGroup = -1)
+    private val _initItem = Account(name="", company = "", number = "", use = false, idGroup = -1L, balance = 0.0)
     private val _initGroup = Group(name="")
 
     private var _listOfItems: MutableStateFlow<List<Account>> = MutableStateFlow(emptyList())
@@ -54,7 +53,7 @@ class SetAccountScreenViewModel(private val repository: AccountRepositoryImpl) :
         }
     }
 
-    private fun getGroup(id: Int) {
+    private fun getGroup(id: Long) {
         viewModelScope.launch {
             withContext(Dispatchers.Default) {
                 _selectedGroup.value = repository.getGroup(id)
@@ -92,17 +91,5 @@ class SetAccountScreenViewModel(private val repository: AccountRepositoryImpl) :
     }
     fun delete(array: Array<Account>) = viewModelScope.launch {
         repository.delete(array)
-    }
-}
-
-class SetAccountScreenViewModelFactory(private val db: AppRoomDatabase) : ViewModelProvider.Factory {
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if(modelClass.isAssignableFrom(SetAccountScreenViewModel::class.java)) {
-            val repository = AccountRepositoryImpl(db)
-            return SetAccountScreenViewModel(repository) as T
-        } else {
-            throw IllegalArgumentException("Failed to create ViewModel : ${modelClass.name}")
-        }
     }
 }

@@ -6,8 +6,8 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "tbl_Category")
 data class Category(
-    @PrimaryKey(autoGenerate = true) val uid: Int = 0,
+    @PrimaryKey(autoGenerate = true) val uid: Long = 0,
     @ColumnInfo(name = "name") var name: String,
-    @ColumnInfo(name = "idParent") var pid: Int,
+    @ColumnInfo(name = "idParent") var pid: Long,
     @ColumnInfo(name = "depth") var depth: Int = -1
 )

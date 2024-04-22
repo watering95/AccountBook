@@ -36,6 +36,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -45,34 +46,33 @@ import com.example.accountbook.componant.ScreenValue
 import com.example.accountbook.componant.Spinner
 import com.example.accountbook.componant.TopBarWithAdd
 import com.example.accountbook.componant.TopBarWithDelete
-import com.example.accountbook.data.Card
+import com.example.accountbook.data.CreditCard
 import com.example.accountbook.drawerBodies
 import com.example.accountbook.drawerHeads
 import com.example.accountbook.ui.theme.CardListTheme
 import com.example.accountbook.ui.theme.CardTheme
-import com.example.accountbook.viewmodel.SetCardScreenViewModel
-import com.example.accountbook.viewmodel.SetCardScreenViewModelFactory
+import com.example.accountbook.viewmodel.AccountBookAppViewModelFactory
+import com.example.accountbook.viewmodel.SetCreditCardScreenViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
-fun SetCardScreen(
-    db: AppRoomDatabase,
-    screenValue: ScreenValue,
-    viewModel: SetCardScreenViewModel = viewModel(
-        factory = SetCardScreenViewModelFactory(db)
-    )
+fun SetCreditCardScreen(
+    screenValue: ScreenValue
 ) {
-    val cards by viewModel.listOfItems.collectAsState()
+    val viewModel: SetCreditCardScreenViewModel = viewModel(
+        factory = AccountBookAppViewModelFactory(AppRoomDatabase.getInstance(LocalContext.current, screenValue.coroutineScope))
+    )
+    val creditCards by viewModel.listOfItems.collectAsState()
 
-    ItemScreen(screenValue = screenValue, items = cards)
+    ItemScreen(screenValue = screenValue, items = creditCards)
 }
 
 @Composable
 fun ItemScreen(
     screenValue: ScreenValue,
-    items: List<Card>,
-    viewModel: SetCardScreenViewModel = viewModel()
+    items: List<CreditCard>,
+    viewModel: SetCreditCardScreenViewModel = viewModel()
 ) {
     val navController = screenValue.navController
     val scaffoldState = screenValue.scaffoldState
@@ -87,7 +87,7 @@ fun ItemScreen(
         viewModel.aCardIsTaped()
     }
     val deleteItems: ()-> Unit = {
-        var selected = arrayOf<Card>()
+        var selected = arrayOf<CreditCard>()
         val iterator = viewModel.checkedCards.value.iterator()
         var index = 0
         while(iterator.hasNext()) {
@@ -151,7 +151,7 @@ fun ItemScreen(
 
 @Composable
 private fun ShowItemCards(
-    items: List<Card>
+    items: List<CreditCard>
 ) {
     CardListTheme {
         // A surface container using the 'background' color from the theme
@@ -163,11 +163,11 @@ private fun ShowItemCards(
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 items(items) { item ->
-                    val card by remember { mutableStateOf(item) }
+                    val creditCard by remember { mutableStateOf(item) }
                     val index by remember { mutableIntStateOf(items.indexOf(item)) }
                     val checkMode = remember { mutableStateOf(false) }
 
-                    ItemCard(index = index, item = card, checkMode = checkMode)
+                    ItemCard(index = index, item = creditCard, checkMode = checkMode)
                 }
             }
         }
@@ -177,9 +177,9 @@ private fun ShowItemCards(
 @Composable
 fun ItemCard(
     index: Int,
-    item: Card,
+    item: CreditCard,
     checkMode: MutableState<Boolean>,
-    viewModel: SetCardScreenViewModel = viewModel()
+    viewModel: SetCreditCardScreenViewModel = viewModel()
 ) {
     CardTheme {
         // A surface container using the 'background' color from the theme
@@ -224,7 +224,7 @@ fun ItemCard(
 
 @Composable
 private fun ItemEditDialog(
-    viewModel: SetCardScreenViewModel = viewModel()
+    viewModel: SetCreditCardScreenViewModel = viewModel()
 ) {
     val accounts by viewModel.listOfAccounts.collectAsState()
 
@@ -236,29 +236,29 @@ private fun ItemEditDialog(
             shape = RoundedCornerShape(size = 10.dp)
         ) {
             Column(modifier = Modifier.padding(all = 16.dp)) {
-                val card = viewModel.selectedItem.value
+                val creditCard = viewModel.selectedItem.value
                 val selectedAccount = viewModel.selectedAccount.collectAsState()
                 val list = mutableListOf<String>()
                 accounts.forEach { account ->
                     list.add(account.name)
                 }
-                var name by remember { mutableStateOf(card.name) }
-                var company by remember { mutableStateOf(card.company) }
-                var number by remember { mutableStateOf(card.number) }
-                var idAccount = card.idAccount
+                var name by remember { mutableStateOf(creditCard.name) }
+                var company by remember { mutableStateOf(creditCard.company) }
+                var number by remember { mutableStateOf(creditCard.number) }
+                var idAccount = creditCard.idAccount
                 val preSelected =
-                        if(idAccount == -1) list[0]
+                        if(idAccount == -1L) list[0]
                         else selectedAccount.value.name
                 val saveItem = {
-                    card.name = name
-                    card.company = company
-                    card.number = number
-                    card.idAccount = idAccount
-                    if(card.uid == 0) viewModel.insert(card) else viewModel.update(card)
+                    creditCard.name = name
+                    creditCard.company = company
+                    creditCard.number = number
+                    creditCard.idAccount = idAccount
+                    if(creditCard.uid == 0L) viewModel.insert(creditCard) else viewModel.update(creditCard)
                     viewModel.aCardIsTaped()
                 }
 
-                Text("Card Name")
+                Text("CreditCard Name")
                 TextField(
                     modifier = Modifier
                         .fillMaxWidth(),
@@ -270,7 +270,7 @@ private fun ItemEditDialog(
                         .fillMaxWidth(),
                     value = company,
                     onValueChange = {company = it})
-                Text("Card Number")
+                Text("CreditCard Number")
                 TextField(
                     modifier = Modifier
                         .fillMaxWidth(),

@@ -3,6 +3,8 @@ package com.example.accountbook
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
@@ -14,10 +16,12 @@ import androidx.navigation.compose.composable
 import com.example.accountbook.componant.ScreenValue
 import com.example.accountbook.navigation.NavItem
 import com.example.accountbook.screen.*
+import com.example.accountbook.viewmodel.AccountBookAppViewModelFactory
 import kotlinx.coroutines.CoroutineScope
 
-val drawerHeads = listOf(NavItem.MainScreen.route, "Set Group","Set Account", "Set Card", "Set Category","DB")
-val drawerBodies = listOf("Account1","Account2","Account3","Account4","Account5","Account6","Account1","Account2","Account3","Account4","Account5","Account6","Account1","Account2","Account3","Account4","Account5","Account6")
+val drawerHeads = listOf(NavItem.MainScreen, NavItem.SetGroupScreen,
+    NavItem.SetAccountScreen, NavItem.SetCategoryScreen, NavItem.SetCreditCardScreen)
+val drawerBodies = mutableListOf<String>()
 
 @Composable
 fun AccountBookApp(
@@ -25,38 +29,41 @@ fun AccountBookApp(
     scaffoldState: ScaffoldState = rememberScaffoldState(),
     coroutineScope: CoroutineScope = rememberCoroutineScope()
 ) {
-    val screenValue = ScreenValue(navController, scaffoldState, coroutineScope)
-
-    AccountBookNavHost(screenValue)
+    AccountBookNavigationGraph(ScreenValue(navController, scaffoldState, coroutineScope))
 }
 
 @Composable
-fun AccountBookNavHost(
-    screenValue: ScreenValue,
-    viewModel: AccountBookAppViewModel = viewModel()
+fun AccountBookNavigationGraph(
+    screenValue: ScreenValue
 ) {
+    val viewModel: AccountBookAppViewModel = viewModel(
+        factory = AccountBookAppViewModelFactory(AppRoomDatabase.getInstance(LocalContext.current, screenValue.coroutineScope))
+    )
+    val accounts by viewModel.listOfAccounts.collectAsState()
+
+    drawerBodies.clear()
+    accounts.forEach {
+        drawerBodies.add(it.name)
+    }
+
     NavHost(navController = screenValue.navController, startDestination = NavItem.MainScreen.route) {
         drawerHeads.forEach { route ->
-            composable(route) {
-                val db = (LocalContext.current as MainActivity).db
+            composable(route.route) {
+                viewModel.changeTitle(route.title)
 
-                viewModel.changeTitle(route)
-
-                when (route) {
+                when (route.route) {
                     NavItem.MainScreen.route -> MainScreen(screenValue)
-                    "Set Group" -> SetGroupScreen(db, screenValue)
-                    "Set Account" -> SetAccountScreen(db, screenValue)
-                    "Set Card" -> SetCardScreen(db, screenValue)
-                    "Set Category" -> SetCategoryScreen(db, screenValue)
+                    NavItem.SetGroupScreen.route -> SetGroupScreen(screenValue)
+                    NavItem.SetAccountScreen.route -> SetAccountScreen(screenValue)
+                    NavItem.SetCreditCardScreen.route -> SetCreditCardScreen(screenValue)
+                    NavItem.SetCategoryScreen.route -> SetCategoryScreen(screenValue)
                 }
             }
         }
         drawerBodies.forEach { route ->
             composable(route) {
-                viewModel.changeTitle(route)
-                AccountScreen()
+                AccountScreen(title = route, screenValue)
             }
-
         }
     }
 }

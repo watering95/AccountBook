@@ -18,8 +18,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun BookScreen() {
-    Column (
-    ) {
+    Column {
         val configuration = LocalConfiguration.current
         val screenWidth = configuration.screenWidthDp
 
@@ -38,7 +37,7 @@ fun BookScreen() {
             }
             Column {
                 Text("Monthly Income")
-                Text("MOnthly Spending")
+                Text("Monthly Spending")
             }
         }
 

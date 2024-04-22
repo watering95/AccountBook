@@ -13,10 +13,9 @@ import kotlinx.coroutines.*
 
 class MainActivity : ComponentActivity() {
     private val scope = CoroutineScope(Job() + Dispatchers.Main)
-    lateinit var db: AppRoomDatabase
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        db = AppRoomDatabase.getInstance(this, scope)
+        AppRoomDatabase.getInstance(this, scope)
         setContent {
             AccountBookTheme {
                 // A surface container using the 'background' color from the theme

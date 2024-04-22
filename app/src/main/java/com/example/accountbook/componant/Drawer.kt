@@ -8,17 +8,18 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.accountbook.navigation.NavItem
 
 @Composable
 fun Drawer(
-    drawerHeads: List<String>,
+    drawerHeads: List<NavItem>,
     drawerBodies: List<String>,
     itemClick: (String) -> Unit
 ) {
-    Column() {
+    Column {
         drawerHeads.forEach { item ->
-            DrawerHeader(item) {
-                itemClick(item)
+            DrawerHeader(item.route) {
+                itemClick(item.route)
             }
         }
     }

@@ -37,6 +37,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -51,19 +52,18 @@ import com.example.accountbook.drawerBodies
 import com.example.accountbook.drawerHeads
 import com.example.accountbook.ui.theme.CardListTheme
 import com.example.accountbook.ui.theme.CardTheme
+import com.example.accountbook.viewmodel.AccountBookAppViewModelFactory
 import com.example.accountbook.viewmodel.SetCategoryScreenViewModel
-import com.example.accountbook.viewmodel.SetCategoryScreenViewModelFactory
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
 fun SetCategoryScreen(
-    db: AppRoomDatabase,
-    screenValue: ScreenValue,
-    viewModel: SetCategoryScreenViewModel = viewModel(
-        factory = SetCategoryScreenViewModelFactory(db)
-    )
+    screenValue: ScreenValue
 ) {
+    val viewModel: SetCategoryScreenViewModel = viewModel(
+        factory = AccountBookAppViewModelFactory(AppRoomDatabase.getInstance(LocalContext.current, screenValue.coroutineScope))
+    )
     val categories = viewModel.listOfItems.collectAsState()
 
     ItemScreen(screenValue = screenValue, items = categories.value)
@@ -263,7 +263,7 @@ private fun ItemEditDialog(
                     category.name = name
                     category.pid = idParent
                     category.depth = depth.intValue
-                    if(category.uid == 0) viewModel.insert(category) else viewModel.update(category)
+                    if(category.uid == 0L) viewModel.insert(category) else viewModel.update(category)
                     viewModel.aCardIsTaped()
                 }
 
@@ -276,7 +276,7 @@ private fun ItemEditDialog(
 
                 if(depth.intValue >= 0) {
                     val preSelected0 =
-                        if(category.pid == -1) list0[0]
+                        if(category.pid == -1L) list0[0]
                         else viewModel.preSelected0.value
 
                     level0 = preSelected0
@@ -300,7 +300,7 @@ private fun ItemEditDialog(
                 }
                 if(depth.intValue >= 1) {
                     val preSelected1 =
-                        if(category.pid == -1) list0[0]
+                        if(category.pid == -1L) list0[0]
                         else viewModel.preSelected1.value
 
                     level1 = preSelected1

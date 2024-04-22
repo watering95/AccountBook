@@ -12,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -25,19 +26,18 @@ import com.example.accountbook.drawerBodies
 import com.example.accountbook.drawerHeads
 import com.example.accountbook.ui.theme.CardListTheme
 import com.example.accountbook.ui.theme.CardTheme
+import com.example.accountbook.viewmodel.AccountBookAppViewModelFactory
 import com.example.accountbook.viewmodel.SetGroupScreenViewModel
-import com.example.accountbook.viewmodel.SetGroupScreenViewModelFactory
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
 fun SetGroupScreen(
-    db: AppRoomDatabase,
-    screenValue: ScreenValue,
-    viewModel: SetGroupScreenViewModel = viewModel(
-        factory = SetGroupScreenViewModelFactory(db)
-    )
+    screenValue: ScreenValue
 ) {
+    val viewModel: SetGroupScreenViewModel = viewModel(
+        factory = AccountBookAppViewModelFactory(AppRoomDatabase.getInstance(LocalContext.current, screenValue.coroutineScope))
+    )
     val items by viewModel.listOfItems.collectAsState()
 
     ItemScreen(screenValue = screenValue, items)
@@ -212,7 +212,7 @@ private fun ItemEditDialog(
                 var name by remember {mutableStateOf(group.name)}
                 val saveItem = {
                     group.name = name
-                    if(group.uid == 0) viewModel.insert(group) else viewModel.update(group)
+                    if(group.uid == 0L) viewModel.insert(group) else viewModel.update(group)
                     viewModel.aCardIsTaped()
                 }
 
@@ -221,7 +221,8 @@ private fun ItemEditDialog(
                     modifier = Modifier
                         .fillMaxWidth(),
                     value = name,
-                    onValueChange = {name = it})
+                    onValueChange = {name = it}
+                )
                 Row {
                     Button(
                         modifier = Modifier.weight(1f),

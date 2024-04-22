@@ -36,6 +36,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -50,19 +51,18 @@ import com.example.accountbook.drawerBodies
 import com.example.accountbook.drawerHeads
 import com.example.accountbook.ui.theme.CardListTheme
 import com.example.accountbook.ui.theme.CardTheme
-import com.example.accountbook.viewmodel.SetAccountScreenViewModelFactory
+import com.example.accountbook.viewmodel.AccountBookAppViewModelFactory
 import com.example.accountbook.viewmodel.SetAccountScreenViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
 fun SetAccountScreen(
-    db: AppRoomDatabase,
-    screenValue: ScreenValue,
-    viewModel: SetAccountScreenViewModel = viewModel(
-        factory = SetAccountScreenViewModelFactory(db)
-    )
+    screenValue: ScreenValue
 ) {
+    val viewModel: SetAccountScreenViewModel = viewModel(
+        factory = AccountBookAppViewModelFactory(AppRoomDatabase.getInstance(LocalContext.current, screenValue.coroutineScope))
+    )
     val accounts by viewModel.listOfItems.collectAsState()
 
     ItemScreen(screenValue = screenValue, items = accounts)
@@ -246,7 +246,7 @@ private fun ItemEditDialog(
                 var number by remember { mutableStateOf(account.number) }
                 var idGroup = account.idGroup
                 val preSelected =
-                        if(idGroup == -1) "No Group"
+                        if(idGroup == -1L) "No Group"
                         else selectedGroup.value.name
 
                 val saveItem = {
@@ -254,7 +254,7 @@ private fun ItemEditDialog(
                     account.company = company
                     account.number = number
                     account.idGroup = idGroup
-                    if(account.uid == 0) viewModel.insert(account) else viewModel.update(account)
+                    if(account.uid == 0L) viewModel.insert(account) else viewModel.update(account)
                     viewModel.aCardIsTaped()
                 }
 
