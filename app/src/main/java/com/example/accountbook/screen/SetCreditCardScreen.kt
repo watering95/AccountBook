@@ -1,9 +1,7 @@
 package com.example.accountbook.screen
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,14 +15,13 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.Card
-import androidx.compose.material.Checkbox
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
@@ -32,6 +29,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,14 +39,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.accountbook.AppRoomDatabase
-import com.example.accountbook.componant.Drawer
 import com.example.accountbook.componant.ScreenValue
 import com.example.accountbook.componant.Spinner
-import com.example.accountbook.componant.TopBarWithAdd
-import com.example.accountbook.componant.TopBarWithDelete
 import com.example.accountbook.data.CreditCard
-import com.example.accountbook.drawerBodies
-import com.example.accountbook.drawerHeads
 import com.example.accountbook.ui.theme.CardListTheme
 import com.example.accountbook.ui.theme.CardTheme
 import com.example.accountbook.viewmodel.AccountBookAppViewModelFactory
@@ -58,30 +51,21 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun SetCreditCardScreen(
-    screenValue: ScreenValue
 ) {
     val viewModel: SetCreditCardScreenViewModel = viewModel(
-        factory = AccountBookAppViewModelFactory(AppRoomDatabase.getInstance(LocalContext.current, screenValue.coroutineScope))
+        factory = AccountBookAppViewModelFactory(AppRoomDatabase.getInstance(LocalContext.current, rememberCoroutineScope()))
     )
     val creditCards by viewModel.listOfItems.collectAsState()
 
-    ItemScreen(screenValue = screenValue, items = creditCards)
+    ItemScreen(items = creditCards)
+    if(viewModel.aCardIsTaped.value) ShowItemCards(items = creditCards)
 }
 
 @Composable
 fun ItemScreen(
-    screenValue: ScreenValue,
     items: List<CreditCard>,
     viewModel: SetCreditCardScreenViewModel = viewModel()
 ) {
-    val navController = screenValue.navController
-    val scaffoldState = screenValue.scaffoldState
-    val coroutineScope = screenValue.coroutineScope
-    val openDrawer: ()->Unit = {
-        coroutineScope.launch {
-            scaffoldState.drawerState.open()
-        }
-    }
     val addItem = {
         viewModel.clearSelectedCards()
         viewModel.aCardIsTaped()
@@ -100,53 +84,6 @@ fun ItemScreen(
         viewModel.delete(selected)
         viewModel.aCardIsLongPressed()
     }
-
-    Scaffold (
-        scaffoldState = scaffoldState,
-        topBar = {
-            if(viewModel.aCardIsLongPressed.value)
-                TopBarWithDelete(
-                    title = viewModel.title.value,
-                    onButtonNavigationClicked = openDrawer,
-                    onButtonDeleteClicked = deleteItems
-                )
-            else
-                TopBarWithAdd(
-                    title = viewModel.title.value,
-                    onButtonNavigationClicked = openDrawer,
-                    onButtonAddClicked =  addItem
-                )
-        },
-        drawerContent = {
-            Drawer(
-                drawerBodies = drawerBodies,
-                drawerHeads = drawerHeads
-            ) { route ->
-                coroutineScope.launch {
-                    delay(250)
-                    scaffoldState.drawerState.close()
-                }
-                navController.navigate(route) {
-                    navController.graph.startDestinationRoute?.let { route ->
-                        popUpTo(route) {
-                            saveState = true
-                        }
-                    }
-                    launchSingleTop = true
-                    restoreState = true
-                }
-            }
-        }
-    ) {
-        Box(
-            modifier = Modifier
-                .padding(it)
-                .background(MaterialTheme.colors.primary)
-        ) {
-            ShowItemCards(items)
-            if(viewModel.aCardIsTaped.value) ItemEditDialog()
-        }
-    }
 }
 
 @Composable
@@ -155,7 +92,7 @@ private fun ShowItemCards(
 ) {
     CardListTheme {
         // A surface container using the 'background' color from the theme
-        Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
+        Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             LazyVerticalGrid(
                 modifier = Modifier.padding(4.dp),
                 columns = GridCells.Adaptive(minSize = 256.dp),
@@ -183,7 +120,7 @@ fun ItemCard(
 ) {
     CardTheme {
         // A surface container using the 'background' color from the theme
-        Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
+        Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             Card(
                 modifier = Modifier
                     .padding(4.dp)
@@ -195,7 +132,7 @@ fun ItemCard(
                         )
                     },
             ) {
-                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
+                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {

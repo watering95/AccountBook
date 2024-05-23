@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">AccountBook</string>
+    <string name="screen_home">Home</string>
+    <string name="screen_book">가계부</string>
+    <string name="screen_setting">설정</string>
+    <string name="screen_set_group">그룹 설정</string>
+    <string name="screen_set_account">계좌 설정</string>
+    <string name="screen_set_credit_card">신용카드 설정</string>
+    <string name="screen_set_category">카테고리 설정</string>
 </resources>

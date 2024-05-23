@@ -9,6 +9,7 @@ import com.example.accountbook.repository.CategoryRepositoryImpl
 import com.example.accountbook.repository.CreditCardRepositoryImpl
 import com.example.accountbook.repository.GroupRepositoryImpl
 import com.example.accountbook.repository.HomeRepositoryImpl
+import com.example.accountbook.repository.SettingRepositoryImpl
 
 class AccountBookAppViewModelFactory(private val db: AppRoomDatabase) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
@@ -22,6 +23,9 @@ class AccountBookAppViewModelFactory(private val db: AppRoomDatabase) : ViewMode
         } else if(modelClass.isAssignableFrom(HomeScreenViewModel::class.java)) {
             val repository = HomeRepositoryImpl(db)
             HomeScreenViewModel(repository) as T
+        } else if(modelClass.isAssignableFrom(SettingScreenViewModel::class.java)) {
+            val repository = SettingRepositoryImpl(db)
+            SettingScreenViewModel(repository) as T
         } else if(modelClass.isAssignableFrom(SetAccountScreenViewModel::class.java)) {
             val repository = AccountRepositoryImpl(db)
             SetAccountScreenViewModel(repository) as T

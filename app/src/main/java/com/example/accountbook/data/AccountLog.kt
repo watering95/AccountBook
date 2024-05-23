@@ -18,6 +18,3 @@ data class AccountLog(
     @ColumnInfo(name = "date") val date:String,
     @ColumnInfo(name = "balance") val balance:Double,
     @ColumnInfo(name = "evaluation") val evaluation:Double)
-{
-
-}

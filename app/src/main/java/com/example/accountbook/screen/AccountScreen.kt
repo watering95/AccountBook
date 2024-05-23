@@ -3,7 +3,6 @@ package com.example.accountbook.screen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -11,11 +10,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -26,17 +24,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.accountbook.AppRoomDatabase
-import com.example.accountbook.componant.Drawer
 import com.example.accountbook.componant.ScreenValue
-import com.example.accountbook.componant.TopBarForAccountScreen
 import com.example.accountbook.data.AccountLog
-import com.example.accountbook.drawerBodies
-import com.example.accountbook.drawerHeads
 import com.example.accountbook.ui.theme.CardListTheme
 import com.example.accountbook.ui.theme.CardTheme
 import com.example.accountbook.viewmodel.AccountBookAppViewModelFactory
 import com.example.accountbook.viewmodel.AccountScreenViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -68,45 +61,13 @@ fun Screen(
     val input: ()->Unit = {}
     val money: ()->Unit = {}
 
-    Scaffold (
-        scaffoldState = scaffoldState,
-        topBar = { TopBarForAccountScreen(title = title, openDrawer, input, money) },
-        drawerContent = {
-            Drawer(
-                drawerBodies = drawerBodies,
-                drawerHeads = drawerHeads
-            ) { route ->
-                coroutineScope.launch {
-                    delay(250)
-                    scaffoldState.drawerState.close()
-                }
-                navController.navigate(route) {
-                    navController.graph.startDestinationRoute?.let { route ->
-                        popUpTo(route) {
-                            saveState = true
-                        }
-                    }
-                    launchSingleTop = true
-                    restoreState = true
-                }
-            }
-        }
-    ) {
-        Box(
-            modifier = Modifier
-                .padding(it)
-                .background(MaterialTheme.colors.primary)
-        ) {
-            ShowList(items)
-        }
-    }
 }
 
 @Composable
 private fun ShowList(items: List<AccountLog>) {
     CardListTheme {
         // A surface container using the 'background' color from the theme
-        Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
+        Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             LazyVerticalGrid(
                 modifier = Modifier.padding(4.dp),
                 columns = GridCells.Adaptive(minSize = 256.dp),
@@ -125,7 +86,7 @@ private fun ShowList(items: List<AccountLog>) {
 fun ItemCard(item:AccountLog) {
     CardTheme {
         // A surface container using the 'background' color from the theme
-        Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
+        Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             Card(
                 modifier = Modifier
                     .padding(4.dp)
@@ -136,7 +97,7 @@ fun ItemCard(item:AccountLog) {
                         )
                     },
             ) {
-                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
+                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
