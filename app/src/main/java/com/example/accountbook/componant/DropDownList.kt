@@ -3,7 +3,10 @@ package com.example.accountbook.componant
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,16 +39,13 @@ fun Spinner(
                 list.forEach { entry ->
                     DropdownMenuItem(
                         modifier = Modifier.fillMaxWidth(),
+                        text = {Text(entry)},
                         onClick = {
                             selected = entry
                             expanded = false
                             onSelectionChanged(selected)
                         }
-                    ) {
-                        Text(
-                            text = entry
-                        )
-                    }
+                    )
                 }
             }
         }

@@ -16,8 +16,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.accountbook.componant.RootTopBar
-import com.example.accountbook.componant.SettingTopBar
 import com.example.accountbook.navigation.AppScreen
 import com.example.accountbook.navigation.RootNavHost
 import com.example.accountbook.viewmodel.AccountBookAppViewModel
@@ -28,54 +26,40 @@ fun AccountBookApp() {
     val viewModel: AccountBookAppViewModel = viewModel(
         factory = AccountBookAppViewModelFactory(AppRoomDatabase.getInstance(LocalContext.current, rememberCoroutineScope()))
     )
+
     val navController = rememberNavController()
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
 
-    val bottomItems = listOf(AppScreen.BottomBar.Home, AppScreen.BottomBar.Book, AppScreen.BottomBar.Setting)
+    RootNavHost(navController)
 
-    val topBar = @Composable {
-        when(currentRoute) {
-            AppScreen.BottomBar.Home.route -> RootTopBar(title = viewModel.title.value)
-            AppScreen.BottomBar.Book.route -> RootTopBar(title = viewModel.title.value)
-            AppScreen.BottomBar.Setting.route -> RootTopBar(title = viewModel.title.value)
-            AppScreen.SetScreen.SetGroup.route -> SettingTopBar(title = AppScreen.SetScreen.SetGroup.title, onButtonNavigationClicked = { navController.popBackStack() })
-            AppScreen.SetScreen.SetAccount.route -> SettingTopBar(title = AppScreen.SetScreen.SetAccount.title, onButtonNavigationClicked = { navController.popBackStack() })
-            AppScreen.SetScreen.SetCategory.route -> SettingTopBar(title = AppScreen.SetScreen.SetCategory.title, onButtonNavigationClicked = { navController.popBackStack() })
-            AppScreen.SetScreen.SetCreditCard.route -> SettingTopBar(title = AppScreen.SetScreen.SetCreditCard.title, onButtonNavigationClicked = { navController.popBackStack() })
-        }
- 
-    }
-    val bottomBar = @Composable {
-        NavigationBar {
-            bottomItems.forEachIndexed { index, item ->
-                NavigationBarItem(
-                    icon = { Icon(item.icon, contentDescription = item.route) },
-                    label = { Text(item.route) },
-                    selected = currentRoute == item.route,
-                    onClick = {
-                        viewModel.changeTitle(item.title)
-                        navigate(navController, item.route)
-                    }
-                )
-            }
-        }
-    }
-
-    CommonScaffold(topBar, bottomBar) {
-        RootNavHost(navController)
-    }
 }
 
 @Composable
 fun CommonScaffold(
     topBar: @Composable () -> Unit,
-    bottomBar: @Composable () -> Unit,
+    navController: NavHostController,
     screen: @Composable () -> Unit
 ) {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
     Scaffold(
         topBar = topBar,
-        bottomBar = bottomBar
+        bottomBar = @Composable {
+            val bottomItems = listOf(AppScreen.BottomBar.Home, AppScreen.BottomBar.Book, AppScreen.BottomBar.Setting)
+
+            NavigationBar {
+                bottomItems.forEachIndexed { index, item ->
+                    NavigationBarItem(
+                        icon = { Icon(item.icon, contentDescription = item.route) },
+                        label = { Text(item.route) },
+                        selected = currentRoute == item.route,
+                        onClick = {
+                            navigate(navController, item.route)
+                        }
+                    )
+                }
+            }
+        }
     ) {
         Box(modifier = Modifier.padding(it)) {
             screen()

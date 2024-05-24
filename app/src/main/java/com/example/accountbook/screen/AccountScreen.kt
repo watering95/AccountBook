@@ -1,6 +1,5 @@
 package com.example.accountbook.screen
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -17,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
@@ -24,40 +24,27 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.accountbook.AppRoomDatabase
-import com.example.accountbook.componant.ScreenValue
 import com.example.accountbook.data.AccountLog
-import com.example.accountbook.ui.theme.CardListTheme
-import com.example.accountbook.ui.theme.CardTheme
 import com.example.accountbook.viewmodel.AccountBookAppViewModelFactory
 import com.example.accountbook.viewmodel.AccountScreenViewModel
-import kotlinx.coroutines.launch
 
 @Composable
 fun AccountScreen(
     title: String,
-    screenValue: ScreenValue,
 ) {
     val viewModel: AccountScreenViewModel = viewModel(
-        factory = AccountBookAppViewModelFactory(AppRoomDatabase.getInstance(LocalContext.current, screenValue.coroutineScope))
+        factory = AccountBookAppViewModelFactory(AppRoomDatabase.getInstance(LocalContext.current, rememberCoroutineScope()))
     )
     val items by viewModel.listOfItems.collectAsState()
-    Screen(items, title, screenValue)
+    Screen(items, title)
 }
 
 @Composable
 fun Screen(
     items: List<AccountLog>,
     title: String,
-    screenValue: ScreenValue
 ) {
-    val navController = screenValue.navController
-    val scaffoldState = screenValue.scaffoldState
-    val coroutineScope = screenValue.coroutineScope
-    val openDrawer: ()->Unit = {
-        coroutineScope.launch {
-            scaffoldState.drawerState.open()
-        }
-    }
+
     val input: ()->Unit = {}
     val money: ()->Unit = {}
 
@@ -65,7 +52,6 @@ fun Screen(
 
 @Composable
 private fun ShowList(items: List<AccountLog>) {
-    CardListTheme {
         // A surface container using the 'background' color from the theme
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             LazyVerticalGrid(
@@ -79,12 +65,10 @@ private fun ShowList(items: List<AccountLog>) {
                 }
             }
         }
-    }
 }
 
 @Composable
 fun ItemCard(item:AccountLog) {
-    CardTheme {
         // A surface container using the 'background' color from the theme
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             Card(
@@ -93,7 +77,7 @@ fun ItemCard(item:AccountLog) {
                     .height(64.dp)
                     .pointerInput(Unit) {
                         detectTapGestures(
-                            onTap = {  }
+                            onTap = { }
                         )
                     },
             ) {
@@ -129,5 +113,4 @@ fun ItemCard(item:AccountLog) {
                 }
             }
         }
-    }
 }

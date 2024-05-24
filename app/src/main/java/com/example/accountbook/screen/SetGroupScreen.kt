@@ -21,24 +21,32 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.example.accountbook.AppRoomDatabase
+import com.example.accountbook.CommonScaffold
+import com.example.accountbook.componant.SettingTopBar
 import com.example.accountbook.data.Group
-import com.example.accountbook.ui.theme.CardListTheme
-import com.example.accountbook.ui.theme.CardTheme
+import com.example.accountbook.navigation.AppScreen
 import com.example.accountbook.viewmodel.AccountBookAppViewModelFactory
 import com.example.accountbook.viewmodel.SetGroupScreenViewModel
 
 @Composable
 fun SetGroupScreen(
+    navController: NavHostController
 ) {
     val viewModel: SetGroupScreenViewModel = viewModel(
         factory = AccountBookAppViewModelFactory(AppRoomDatabase.getInstance(LocalContext.current, rememberCoroutineScope()))
     )
     val items by viewModel.listOfItems.collectAsState()
 
-    ShowItemCards(items)
+    val topBar = @Composable { SettingTopBar(title = AppScreen.SetScreen.SetGroup.title, onButtonNavigationClicked = {navController.popBackStack()}) }
 
-    if(viewModel.aCardIsTaped.value) ItemEditDialog()
+    CommonScaffold(topBar, navController) {
+        ShowItemCards(items)
+
+        if(viewModel.aCardIsTaped.value) ItemEditDialog()
+    }
+
 }
 
 // 리스트 보여주기
@@ -46,7 +54,6 @@ fun SetGroupScreen(
 private fun ShowItemCards(
     items: List<Group>
 ) {
-    CardListTheme {
         // A surface container using the 'background' color from the theme
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             LazyVerticalGrid(
@@ -64,7 +71,7 @@ private fun ShowItemCards(
                 }
             }
         }
-    }
+
 }
 
 // 카드에 아이템 정보 표시
@@ -75,7 +82,6 @@ fun ItemCard(
     checkMode: MutableState<Boolean>,
     viewModel: SetGroupScreenViewModel = viewModel()
 ) {
-    CardTheme {
         // A surface container using the 'background' color from the theme
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             Card(
@@ -113,7 +119,6 @@ fun ItemCard(
                 }
             }
         }
-    }
 }
 
 // 선택된 아이템 정보 편집 화면

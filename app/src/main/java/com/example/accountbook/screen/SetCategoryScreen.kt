@@ -1,6 +1,5 @@
 package com.example.accountbook.screen
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -40,26 +39,31 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.example.accountbook.AppRoomDatabase
-import com.example.accountbook.componant.ScreenValue
+import com.example.accountbook.CommonScaffold
+import com.example.accountbook.componant.SettingTopBar
 import com.example.accountbook.componant.Spinner
 import com.example.accountbook.data.Category
-import com.example.accountbook.ui.theme.CardListTheme
-import com.example.accountbook.ui.theme.CardTheme
+import com.example.accountbook.navigation.AppScreen
 import com.example.accountbook.viewmodel.AccountBookAppViewModelFactory
 import com.example.accountbook.viewmodel.SetCategoryScreenViewModel
-import kotlinx.coroutines.launch
 
 @Composable
 fun SetCategoryScreen(
+    navController: NavHostController
 ) {
     val viewModel: SetCategoryScreenViewModel = viewModel(
         factory = AccountBookAppViewModelFactory(AppRoomDatabase.getInstance(LocalContext.current, rememberCoroutineScope()))
     )
     val categories = viewModel.listOfItems.collectAsState()
 
-    ItemScreen(items = categories.value)
-    if(viewModel.aCardIsTaped.value) ShowItemCards(items = categories.value)
+    val topBar = @Composable { SettingTopBar(title = AppScreen.SetScreen.SetCategory.title, onButtonNavigationClicked = {navController.popBackStack()}) }
+
+    CommonScaffold(topBar, navController) {
+        ItemScreen(items = categories.value)
+        if(viewModel.aCardIsTaped.value) ShowItemCards(items = categories.value)
+    }
 }
 
 @Composable
@@ -92,7 +96,7 @@ fun ItemScreen(
 private fun ShowItemCards(
     items: List<Category>
 ) {
-    CardListTheme {
+
         // A surface container using the 'background' color from the theme
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             LazyVerticalGrid(
@@ -110,7 +114,7 @@ private fun ShowItemCards(
                 }
             }
         }
-    }
+
 }
 
 @Composable
@@ -120,7 +124,7 @@ fun ItemCard(
     checkMode: MutableState<Boolean>,
     viewModel: SetCategoryScreenViewModel = viewModel()
 ) {
-    CardTheme {
+
         // A surface container using the 'background' color from the theme
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             Card(
@@ -158,7 +162,7 @@ fun ItemCard(
                 }
             }
         }
-    }
+
 }
 
 @Composable

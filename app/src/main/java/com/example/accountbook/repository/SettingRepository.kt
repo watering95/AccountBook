@@ -3,9 +3,6 @@ package com.example.accountbook.repository
 import com.example.accountbook.AppRoomDatabase
 
 
-interface SettingRepository {
+interface SettingRepository
 
-}
-
-class SettingRepositoryImpl(db : AppRoomDatabase): SettingRepository {
-}
+class SettingRepositoryImpl(db : AppRoomDatabase): SettingRepository

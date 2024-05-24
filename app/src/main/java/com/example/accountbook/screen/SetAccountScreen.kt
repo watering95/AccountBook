@@ -39,34 +39,40 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.example.accountbook.AppRoomDatabase
+import com.example.accountbook.CommonScaffold
+import com.example.accountbook.componant.SettingTopBar
 import com.example.accountbook.componant.Spinner
 import com.example.accountbook.data.Account
 import com.example.accountbook.data.Group
-import com.example.accountbook.ui.theme.CardListTheme
-import com.example.accountbook.ui.theme.CardTheme
+import com.example.accountbook.navigation.AppScreen
 import com.example.accountbook.viewmodel.AccountBookAppViewModelFactory
 import com.example.accountbook.viewmodel.SetAccountScreenViewModel
 
 @Composable
 fun SetAccountScreen(
+    navController: NavHostController
 ) {
     val viewModel: SetAccountScreenViewModel = viewModel(
         factory = AccountBookAppViewModelFactory(AppRoomDatabase.getInstance(LocalContext.current, rememberCoroutineScope()))
     )
     val accounts by viewModel.listOfItems.collectAsState()
-
-    ShowItemCards(items = accounts)
-
     val groups by viewModel.listOfGroups.collectAsState()
     val account = viewModel.selectedItem.value
     val selectedGroup = viewModel.selectedGroup.collectAsState()
 
-    if(viewModel.aCardIsTaped.value)
-        ItemEditDialog(account, selectedGroup, groups, { viewModel.aCardIsTaped() }) { account ->
-            if(account.uid == 0L) viewModel.insert(account)
-            else viewModel.update(account)
-        }
+    val topBar = @Composable { SettingTopBar(title = AppScreen.SetScreen.SetAccount.title, onButtonNavigationClicked = {navController.popBackStack()}) }
+
+    CommonScaffold(topBar, navController) {
+        ShowItemCards(items = accounts)
+
+        if(viewModel.aCardIsTaped.value)
+            ItemEditDialog(account, selectedGroup, groups, { viewModel.aCardIsTaped() }) { account ->
+                if(account.uid == 0L) viewModel.insert(account)
+                else viewModel.update(account)
+            }
+    }
 }
 
 @Composable
@@ -156,7 +162,7 @@ private fun ItemEditDialog(
 private fun ShowItemCards(
     items: List<Account>,
 ) {
-    CardListTheme {
+
         // A surface container using the 'background' color from the theme
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             LazyVerticalGrid(
@@ -174,7 +180,7 @@ private fun ShowItemCards(
                 }
             }
         }
-    }
+
 }
 
 @Composable
@@ -184,7 +190,7 @@ fun ItemCard(
     checkMode: MutableState<Boolean>,
     viewModel: SetAccountScreenViewModel = viewModel()
 ) {
-    CardTheme {
+
         // A surface container using the 'background' color from the theme
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             Card(
@@ -222,5 +228,4 @@ fun ItemCard(
                 }
             }
         }
-    }
 }

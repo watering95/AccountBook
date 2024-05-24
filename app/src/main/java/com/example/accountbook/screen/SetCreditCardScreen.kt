@@ -38,27 +38,32 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.example.accountbook.AppRoomDatabase
-import com.example.accountbook.componant.ScreenValue
+import com.example.accountbook.CommonScaffold
+import com.example.accountbook.componant.SettingTopBar
 import com.example.accountbook.componant.Spinner
 import com.example.accountbook.data.CreditCard
-import com.example.accountbook.ui.theme.CardListTheme
-import com.example.accountbook.ui.theme.CardTheme
+import com.example.accountbook.navigation.AppScreen
 import com.example.accountbook.viewmodel.AccountBookAppViewModelFactory
 import com.example.accountbook.viewmodel.SetCreditCardScreenViewModel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @Composable
 fun SetCreditCardScreen(
+    navController: NavHostController
 ) {
     val viewModel: SetCreditCardScreenViewModel = viewModel(
         factory = AccountBookAppViewModelFactory(AppRoomDatabase.getInstance(LocalContext.current, rememberCoroutineScope()))
     )
     val creditCards by viewModel.listOfItems.collectAsState()
 
-    ItemScreen(items = creditCards)
-    if(viewModel.aCardIsTaped.value) ShowItemCards(items = creditCards)
+    val topBar = @Composable { SettingTopBar(title = AppScreen.SetScreen.SetCreditCard.title, onButtonNavigationClicked = {navController.popBackStack()}) }
+
+    CommonScaffold(topBar, navController) {
+        ItemScreen(items = creditCards)
+        if(viewModel.aCardIsTaped.value) ShowItemCards(items = creditCards)
+    }
+
 }
 
 @Composable
@@ -90,7 +95,7 @@ fun ItemScreen(
 private fun ShowItemCards(
     items: List<CreditCard>
 ) {
-    CardListTheme {
+
         // A surface container using the 'background' color from the theme
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             LazyVerticalGrid(
@@ -108,7 +113,7 @@ private fun ShowItemCards(
                 }
             }
         }
-    }
+
 }
 
 @Composable
@@ -118,7 +123,7 @@ fun ItemCard(
     checkMode: MutableState<Boolean>,
     viewModel: SetCreditCardScreenViewModel = viewModel()
 ) {
-    CardTheme {
+
         // A surface container using the 'background' color from the theme
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             Card(
@@ -156,7 +161,7 @@ fun ItemCard(
                 }
             }
         }
-    }
+
 }
 
 @Composable

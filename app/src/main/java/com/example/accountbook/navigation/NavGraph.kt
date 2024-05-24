@@ -13,44 +13,43 @@ import com.example.accountbook.screen.SetGroupScreen
 import com.example.accountbook.screen.SettingScreen
 
 @Composable
-fun RootNavHost(navHostController: NavHostController) {
-    NavHost(navController = navHostController, startDestination = AppScreen.BottomBar.Home.route) {
+fun RootNavHost(navController: NavHostController) {
+    NavHost(navController = navController, startDestination = AppScreen.BottomBar.Home.route) {
         composable(
             route = AppScreen.BottomBar.Home.route
         ) {
-            HomeScreen()
+            HomeScreen(navController)
         }
         composable(
             route = AppScreen.BottomBar.Book.route
         ) {
-            BookScreen()
+            BookScreen(navController)
         }
         composable(
             route = AppScreen.BottomBar.Setting.route
         ) {
-            SettingScreen(navHostController)
+            SettingScreen(navController)
         }
         composable(
             route = AppScreen.SetScreen.SetGroup.route
         ) {
-            SetGroupScreen()
+            SetGroupScreen(navController)
         }
         composable(
             route = AppScreen.SetScreen.SetAccount.route
         ) {
-            SetAccountScreen()
+            SetAccountScreen(navController)
         }
         composable(
             route = AppScreen.SetScreen.SetCategory.route
         ) {
-            SetCategoryScreen()
+            SetCategoryScreen(navController)
         }
         composable(
             route = AppScreen.SetScreen.SetCreditCard.route
         ) {
-            SetCreditCardScreen()
+            SetCreditCardScreen(navController)
         }
-
     }
 }
 
