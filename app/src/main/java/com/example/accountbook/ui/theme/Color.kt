@@ -22,14 +22,14 @@ val Yellow700 = Color(0xFFFBC02D)
 
 val Green = Color(0xFFACD370)
 
-val light_primary = Cyan200
-val light_onPrimary = Cyan200
-val light_primaryContainer = Teal700
+val md_theme_light_primary = Cyan200
+val md_theme_light_onPrimary = Cyan200
+val md_theme_light_primaryContainer = Teal700
 
 //val light_primary = Color(0xFF476810)
 //val light_onPrimary = Color(0xFFC7F089)
 //val light_primaryContainer = Color(0xFFFFFFFF)
 
-val dark_primary = Color(0xFFACD370)
-val dark_onPrimary = Color(0xFF213600)
-val dark_primaryContainer = Color(0xFF324F00)
+val md_theme_dark_primary = Color(0xFFACD370)
+val md_theme_dark_onPrimary = Color(0xFF213600)
+val md_theme_dark_primaryContainer = Color(0xFF324F00)

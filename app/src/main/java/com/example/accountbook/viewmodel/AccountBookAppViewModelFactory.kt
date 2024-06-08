@@ -3,41 +3,30 @@ package com.example.accountbook.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.accountbook.AppRoomDatabase
-import com.example.accountbook.repository.AccountBookRepositoryImpl
-import com.example.accountbook.repository.AccountRepositoryImpl
-import com.example.accountbook.repository.CategoryRepositoryImpl
-import com.example.accountbook.repository.CreditCardRepositoryImpl
-import com.example.accountbook.repository.GroupRepositoryImpl
-import com.example.accountbook.repository.HomeRepositoryImpl
-import com.example.accountbook.repository.SettingRepositoryImpl
+import com.example.accountbook.repository.AccountBookAppRepositoryImpl
+import com.example.accountbook.screen.accountscreen.AccountScreenRepositoryImpl
+import com.example.accountbook.screen.homescreen.HomeScreenRepositoryImpl
+import com.example.accountbook.screen.settingscreen.SettingScreenRepositoryImpl
+import com.example.accountbook.screen.accountscreen.AccountScreenViewModel
+import com.example.accountbook.screen.homescreen.HomeScreenViewModel
+import com.example.accountbook.screen.settingscreen.SettingScreenViewModel
 
-class AccountBookAppViewModelFactory(private val db: AppRoomDatabase) : ViewModelProvider.Factory {
+
+class AccountBookAppViewModelFactory (private val db: AppRoomDatabase) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return if(modelClass.isAssignableFrom(AccountBookAppViewModel::class.java)) {
-            val repository = AccountBookRepositoryImpl(db)
+            val repository = AccountBookAppRepositoryImpl(db)
             AccountBookAppViewModel(repository) as T
         } else if(modelClass.isAssignableFrom(AccountScreenViewModel::class.java)) {
-            val repository = AccountRepositoryImpl(db)
+            val repository = AccountScreenRepositoryImpl(db)
             AccountScreenViewModel(repository) as T
         } else if(modelClass.isAssignableFrom(HomeScreenViewModel::class.java)) {
-            val repository = HomeRepositoryImpl(db)
+            val repository = HomeScreenRepositoryImpl(db)
             HomeScreenViewModel(repository) as T
         } else if(modelClass.isAssignableFrom(SettingScreenViewModel::class.java)) {
-            val repository = SettingRepositoryImpl(db)
+            val repository = SettingScreenRepositoryImpl(db)
             SettingScreenViewModel(repository) as T
-        } else if(modelClass.isAssignableFrom(SetAccountScreenViewModel::class.java)) {
-            val repository = AccountRepositoryImpl(db)
-            SetAccountScreenViewModel(repository) as T
-        } else if(modelClass.isAssignableFrom(SetCategoryScreenViewModel::class.java)) {
-            val repository = CategoryRepositoryImpl(db)
-            SetCategoryScreenViewModel(repository) as T
-        }  else if(modelClass.isAssignableFrom(SetCreditCardScreenViewModel::class.java)) {
-            val repository = CreditCardRepositoryImpl(db)
-            SetCreditCardScreenViewModel(repository) as T
-        } else if(modelClass.isAssignableFrom(SetGroupScreenViewModel::class.java)) {
-            val repository = GroupRepositoryImpl(db)
-            SetGroupScreenViewModel(repository) as T
         } else {
             throw IllegalArgumentException("Failed to create ViewModel : ${modelClass.name}")
         }

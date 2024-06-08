@@ -1,26 +1,28 @@
-package com.example.accountbook.viewmodel
+package com.example.accountbook.screen.homescreen
 
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.accountbook.data.Account
-import com.example.accountbook.repository.AccountBookAppRepositoryImpl
+import com.example.accountbook.data.Group
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-class AccountBookAppViewModel(private val repository: AccountBookAppRepositoryImpl): ViewModel() {
-    private val _title = mutableStateOf("자산")
-    val title : State<String> = _title
+class HomeScreenViewModel(private val repository: HomeScreenRepositoryImpl) : ViewModel() {
+    val listOfGroups: MutableStateFlow<List<Group>> = MutableStateFlow(emptyList())
     val listOfAccounts: MutableStateFlow<List<Account>> = MutableStateFlow(emptyList())
 
-    fun changeTitle(title: String) {
-        _title.value = title
+    init {
+        getAllGroups()
+        getAllAccounts()
     }
 
-    init {
-        getAllAccounts()
+    private fun getAllGroups() {
+        viewModelScope.launch {
+            repository.allGroups.collectLatest {
+                listOfGroups.value = it
+            }
+        }
     }
 
     private fun getAllAccounts() {
@@ -31,5 +33,3 @@ class AccountBookAppViewModel(private val repository: AccountBookAppRepositoryIm
         }
     }
 }
-
-

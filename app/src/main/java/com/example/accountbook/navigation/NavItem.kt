@@ -16,11 +16,11 @@ private object Routes {
     const val BOOK = "Book"
     const val SETTING = "Setting"
 
-    const val SET_HOME = "setHome"
-    const val SET_ACCOUNT = "setAccount"
-    const val SET_CATEGORY = "setCategory"
-    const val SET_CREDIT_CARD = "setCreditCard"
-    const val SET_GROUP = "setGroup"
+    const val SET_SCREEN = "setScreen"
+    const val ACCOUNT_SET = "accountSet"
+    const val CATEGORY_SET = "categorySet"
+    const val CREDIT_CARD_SET = "creditCardSet"
+    const val GROUP_SET = "groupSet"
     const val ACCOUNT = "account/{${ArgParams.ACCOUNT_ID}}"
 }
 
@@ -36,11 +36,11 @@ sealed class AppScreen(val route: String, val title: String, val icon: ImageVect
         data object Book : AppScreen(Routes.BOOK, "가계부", Icons.Default.Book)
         data object Setting : AppScreen(Routes.SETTING, "설정", Icons.Default.Settings)
     }
-    data object SetScreen : AppScreen(Routes.SET_HOME, "설정", Icons.Default.Settings) {
-        data object SetAccount : AppScreen(Routes.SET_ACCOUNT, "계좌 설정", Icons.Default.AccountBalance)
-        data object SetCategory : AppScreen(Routes.SET_CATEGORY, "카테고리 설정", Icons.Default.Category)
-        data object SetCreditCard : AppScreen(Routes.SET_CREDIT_CARD, "신용카드 설정", Icons.Default.CreditCard)
-        data object SetGroup : AppScreen(Routes.SET_GROUP, "그룹 설정", Icons.Default.Group)
+    data object SetScreen : AppScreen(Routes.SET_SCREEN, "설정", Icons.Default.Settings) {
+        data object AccountSet : AppScreen(Routes.ACCOUNT_SET, "계좌 설정", Icons.Default.AccountBalance)
+        data object CategorySet : AppScreen(Routes.CATEGORY_SET, "카테고리 설정", Icons.Default.Category)
+        data object CreditCardSet : AppScreen(Routes.CREDIT_CARD_SET, "신용카드 설정", Icons.Default.CreditCard)
+        data object GroupSet : AppScreen(Routes.GROUP_SET, "그룹 설정", Icons.Default.Group)
     }
 
 

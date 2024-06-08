@@ -4,51 +4,52 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.accountbook.screen.BookScreen
-import com.example.accountbook.screen.HomeScreen
-import com.example.accountbook.screen.SetAccountScreen
-import com.example.accountbook.screen.SetCategoryScreen
-import com.example.accountbook.screen.SetCreditCardScreen
-import com.example.accountbook.screen.SetGroupScreen
-import com.example.accountbook.screen.SettingScreen
+import com.example.accountbook.AppRoomDatabase
+import com.example.accountbook.screen.bookscreen.BookScreenComposable
+import com.example.accountbook.screen.homescreen.HomeScreenComposable
+import com.example.accountbook.screen.categorysetscreen.CategorySetScreenComposable
+import com.example.accountbook.screen.creditcardsetscreen.CreditCardSetScreenComposable
+import com.example.accountbook.screen.groupsetscreen.GroupSetScreenComposable
+import com.example.accountbook.screen.settingscreen.SettingScreenComposable
+import com.example.accountbook.screen.accountsetscreen.AccountSetScreenComposable
 
 @Composable
-fun RootNavHost(navController: NavHostController) {
+fun RootNavHost(navController: NavHostController, db: AppRoomDatabase) {
     NavHost(navController = navController, startDestination = AppScreen.BottomBar.Home.route) {
         composable(
             route = AppScreen.BottomBar.Home.route
         ) {
-            HomeScreen(navController)
+            HomeScreenComposable(navController, db)
         }
         composable(
             route = AppScreen.BottomBar.Book.route
         ) {
-            BookScreen(navController)
+            BookScreenComposable(navController)
         }
         composable(
             route = AppScreen.BottomBar.Setting.route
         ) {
-            SettingScreen(navController)
+            SettingScreenComposable(navController, db)
         }
         composable(
-            route = AppScreen.SetScreen.SetGroup.route
+            route = AppScreen.SetScreen.GroupSet.route
         ) {
-            SetGroupScreen(navController)
+            GroupSetScreenComposable(navController, db)
         }
         composable(
-            route = AppScreen.SetScreen.SetAccount.route
+            route = AppScreen.SetScreen.AccountSet.route
         ) {
-            SetAccountScreen(navController)
+            AccountSetScreenComposable(navController, db)
         }
         composable(
-            route = AppScreen.SetScreen.SetCategory.route
+            route = AppScreen.SetScreen.CategorySet.route
         ) {
-            SetCategoryScreen(navController)
+            CategorySetScreenComposable(navController, db)
         }
         composable(
-            route = AppScreen.SetScreen.SetCreditCard.route
+            route = AppScreen.SetScreen.CreditCardSet.route
         ) {
-            SetCreditCardScreen(navController)
+            CreditCardSetScreenComposable(navController, db)
         }
     }
 }
